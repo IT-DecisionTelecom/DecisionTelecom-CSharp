@@ -1,48 +1,46 @@
-using ITDecision.Sms.Models;
-
 namespace ITDecision
 {
-    public class Result
+    public class Result<TError>
     {
         public bool Success { get; }
 
-        public ErrorCode ErrorCode { get; }
+        public TError Error { get; }
 
         public bool Failure => !Success;
 
-        protected Result(bool success, ErrorCode errorCode)
+        protected Result(bool success, TError error)
         {
             Success = success;
-            ErrorCode = errorCode;
+            Error = error;
         }
 
-        public static Result Fail(ErrorCode errorCode)
+        public static Result<TError> Fail(TError error)
         {
-            return new Result(false, errorCode);
+            return new Result<TError>(false, error);
         }
 
-        public static Result<T> Fail<T>(ErrorCode errorCode)
+        public static Result<T, TError> Fail<T>(TError error)
         {
-            return new Result<T>(default, false, errorCode);
+            return new Result<T, TError>(default, false, error);
         }
 
-        public static Result Ok()
+        public static Result<TError> Ok()
         {
-            return new Result(true, default);
+            return new Result<TError>(true, default);
         }
 
-        public static Result<T> Ok<T>(T value)
+        public static Result<T, TError> Ok<T>(T value)
         {
-            return new Result<T>(value, true, default);
+            return new Result<T, TError>(value, true, default);
         }
     }
     
-    public class Result<T> : Result
+    public class Result<TValue, TError> : Result<TError>
     {
-        public T Value { get; private set; }
+        public TValue Value { get; private set; }
 
-        protected internal Result(T value, bool success, ErrorCode errorCode)
-            : base(success, errorCode)
+        protected internal Result(TValue value, bool success, TError error)
+            : base(success, error)
         {
             Value = value;
         }

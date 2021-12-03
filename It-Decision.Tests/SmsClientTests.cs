@@ -56,7 +56,7 @@ namespace ITDecision.Tests
             var result = await smsClient.SendMessageAsync("", "", "", true);
             
             Assert.True(result.Failure);
-            Assert.Equal(ErrorCode.ServerError, result.ErrorCode);
+            Assert.Equal(ErrorCode.ServerError, result.Error);
         }
         
         [Fact]
@@ -74,7 +74,7 @@ namespace ITDecision.Tests
             var result = await smsClient.SendMessageAsync("", "", "", true);
             
             Assert.True(result.Failure);
-            Assert.Equal(expectedErrorCode, result.ErrorCode);
+            Assert.Equal(expectedErrorCode, result.Error);
         }
         
         [Theory]
@@ -149,7 +149,7 @@ namespace ITDecision.Tests
             var result = await smsClient.GetMessageDeliveryStatusAsync(1234);
             
             Assert.True(result.Failure);
-            Assert.Equal(ErrorCode.ServerError, result.ErrorCode);
+            Assert.Equal(ErrorCode.ServerError, result.Error);
         }
         
         [Fact]
@@ -167,7 +167,7 @@ namespace ITDecision.Tests
             var result = await smsClient.GetMessageDeliveryStatusAsync(1234);
             
             Assert.True(result.Failure);
-            Assert.Equal(expectedErrorCode, result.ErrorCode);
+            Assert.Equal(expectedErrorCode, result.Error);
         }
         
         [Theory]
@@ -229,7 +229,7 @@ namespace ITDecision.Tests
             var result = await smsClient.GetBalanceAsync();
             
             Assert.True(result.Failure);
-            Assert.Equal(ErrorCode.ServerError, result.ErrorCode);
+            Assert.Equal(ErrorCode.ServerError, result.Error);
         }
         
         [Fact]
@@ -247,7 +247,7 @@ namespace ITDecision.Tests
             var result = await smsClient.GetBalanceAsync();
             
             Assert.True(result.Failure);
-            Assert.Equal(expectedErrorCode, result.ErrorCode);
+            Assert.Equal(expectedErrorCode, result.Error);
         }
         
         [Theory]
