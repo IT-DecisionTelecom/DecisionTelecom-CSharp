@@ -1,12 +1,11 @@
 using System;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using ITDecision.Sms;
 using ITDecision.Sms.Models;
+using ITDecision.Tests.Extensions;
 using Moq;
-using Moq.Protected;
 using Xunit;
 
 namespace ITDecision.Tests
@@ -35,7 +34,7 @@ namespace ITDecision.Tests
                 Content = new StringContent($"[\"msgid\",\"{expectedMessageId}\"]"),
             };
             
-            SetupHttpHandlerResponse(response);
+            handlerMock.SetupHttpHandlerResponse(response);
 
             var result = await smsClient.SendMessageAsync("", "", "", true);
             
@@ -51,7 +50,7 @@ namespace ITDecision.Tests
                 StatusCode = HttpStatusCode.InternalServerError,
             };
             
-            SetupHttpHandlerResponse(response);
+            handlerMock.SetupHttpHandlerResponse(response);
             
             var result = await smsClient.SendMessageAsync("", "", "", true);
             
@@ -69,7 +68,7 @@ namespace ITDecision.Tests
                 Content = new StringContent($"[\"error\",\"{(int)expectedErrorCode}\"]"),
             };
             
-            SetupHttpHandlerResponse(response);
+            handlerMock.SetupHttpHandlerResponse(response);
 
             var result = await smsClient.SendMessageAsync("", "", "", true);
             
@@ -94,7 +93,7 @@ namespace ITDecision.Tests
                 Content = new StringContent(responseContent),
             };
             
-            SetupHttpHandlerResponse(response);
+            handlerMock.SetupHttpHandlerResponse(response);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await smsClient.SendMessageAsync("", "", "", true));
@@ -110,7 +109,7 @@ namespace ITDecision.Tests
                 Content = new StringContent($"[\"status\",\"{(int)expectedDeliveryStatus}\"]"),
             };
             
-            SetupHttpHandlerResponse(response);
+            handlerMock.SetupHttpHandlerResponse(response);
 
             var result = await smsClient.GetMessageDeliveryStatusAsync(1234);
             
@@ -128,7 +127,7 @@ namespace ITDecision.Tests
                 Content = new StringContent("[\"status\",\"\"]"),
             };
             
-            SetupHttpHandlerResponse(response);
+            handlerMock.SetupHttpHandlerResponse(response);
 
             var result = await smsClient.GetMessageDeliveryStatusAsync(1234);
             
@@ -144,7 +143,7 @@ namespace ITDecision.Tests
                 StatusCode = HttpStatusCode.InternalServerError,
             };
             
-            SetupHttpHandlerResponse(response);
+            handlerMock.SetupHttpHandlerResponse(response);
 
             var result = await smsClient.GetMessageDeliveryStatusAsync(1234);
             
@@ -162,7 +161,7 @@ namespace ITDecision.Tests
                 Content = new StringContent($"[\"error\",\"{(int)expectedErrorCode}\"]"),
             };
             
-            SetupHttpHandlerResponse(response);
+            handlerMock.SetupHttpHandlerResponse(response);
 
             var result = await smsClient.GetMessageDeliveryStatusAsync(1234);
             
@@ -186,7 +185,7 @@ namespace ITDecision.Tests
                 Content = new StringContent(responseContent),
             };
             
-            SetupHttpHandlerResponse(response);
+            handlerMock.SetupHttpHandlerResponse(response);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await smsClient.GetMessageDeliveryStatusAsync(1234));
@@ -206,7 +205,7 @@ namespace ITDecision.Tests
                     $"[\"balance\":\"{expectedBalance}\",\"credit\":\"{expectedCredit}\",\"currency\":\"{expectedCurrency}\"]"),
             };
             
-            SetupHttpHandlerResponse(response);
+            handlerMock.SetupHttpHandlerResponse(response);
 
             var result = await smsClient.GetBalanceAsync();
             
@@ -224,7 +223,7 @@ namespace ITDecision.Tests
                 StatusCode = HttpStatusCode.InternalServerError,
             };
             
-            SetupHttpHandlerResponse(response);
+            handlerMock.SetupHttpHandlerResponse(response);
 
             var result = await smsClient.GetBalanceAsync();
             
@@ -242,7 +241,7 @@ namespace ITDecision.Tests
                 Content = new StringContent($"[\"error\",\"{(int)expectedErrorCode}\"]"),
             };
             
-            SetupHttpHandlerResponse(response);
+            handlerMock.SetupHttpHandlerResponse(response);
 
             var result = await smsClient.GetBalanceAsync();
             
@@ -269,17 +268,9 @@ namespace ITDecision.Tests
                 Content = new StringContent(responseContent),
             };
             
-            SetupHttpHandlerResponse(response);
+            handlerMock.SetupHttpHandlerResponse(response);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await smsClient.GetBalanceAsync());
         }
-
-        private void SetupHttpHandlerResponse(HttpResponseMessage responseMessage) => handlerMock
-            .Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>())
-            .ReturnsAsync(responseMessage);
     }
 }
