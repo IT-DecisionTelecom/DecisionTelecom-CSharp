@@ -65,7 +65,7 @@ namespace ITDecision.Sms
             Result<int, ErrorCode> OkResultFunc(string responseContent)
             {
                 var responseDict = GetDictionaryFromResponseContent(responseContent);
-                return Result<int, ErrorCode>.Ok(int.Parse(responseDict["msgid"]));
+                return int.Parse(responseDict["msgid"]);
             }
         }
 
@@ -86,8 +86,8 @@ namespace ITDecision.Sms
             { 
                 var responseDict = GetDictionaryFromResponseContent(responseContent);
                 return string.IsNullOrEmpty(responseDict["status"])
-                    ? Result<ReceiptDeliveryStatus, ErrorCode>.Ok(ReceiptDeliveryStatus.Unknown)
-                    : Result<ReceiptDeliveryStatus, ErrorCode>.Ok((ReceiptDeliveryStatus)int.Parse(responseDict["status"]));
+                    ? ReceiptDeliveryStatus.Unknown
+                    : (ReceiptDeliveryStatus)int.Parse(responseDict["status"]);
             }
         }
 
@@ -106,12 +106,12 @@ namespace ITDecision.Sms
             Result<Balance, ErrorCode> OkResultFunc(string responseContent)
             {
                 var responseDict = GetDictionaryFromResponseContent(responseContent, false);
-                return Result<Balance, ErrorCode>.Ok(new Balance
+                return new Balance
                 {
                     BalanceAmount = double.Parse(responseDict["balance"]),
                     CreditAmount = double.Parse(responseDict["credit"]),
                     Currency = responseDict["currency"],
-                });
+                };
             }
         }
 
@@ -128,7 +128,7 @@ namespace ITDecision.Sms
         {
             if (!responseMessage.IsSuccessStatusCode)
             {
-                return Result<T, ErrorCode>.Fail<T>(ErrorCode.ServerError);
+                return ErrorCode.ServerError;
             }
 
             var responseContent = await responseMessage.Content.ReadAsStringAsync();
@@ -165,7 +165,7 @@ namespace ITDecision.Sms
         private static Result<T, ErrorCode> GetErrorResultFromResponseContent<T>(string responseContent)
         {
             var responseDict = GetDictionaryFromResponseContent(responseContent);
-            return Result<T, ErrorCode>.Fail<T>((ErrorCode)int.Parse(responseDict[ErrorText]));
+            return (ErrorCode)int.Parse(responseDict[ErrorText]);
         }
     }
 }
