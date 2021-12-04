@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using ITDecision.Sms.Models;
+using ITDecision.Models;
+using ITDecision.Models.Common;
 
-namespace ITDecision.Sms
+namespace ITDecision
 {
     /// <summary>
     /// SMS Client

@@ -1,4 +1,4 @@
-namespace ITDecision.Sms.Models
+namespace ITDecision.Models
 {
     public enum SmsMessageStatus
     {

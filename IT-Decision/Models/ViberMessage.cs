@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace ITDecision.Viber.Models
+namespace ITDecision.Models
 {
     /// <summary>
     /// 

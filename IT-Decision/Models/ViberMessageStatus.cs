@@ -1,4 +1,4 @@
-namespace ITDecision.Viber.Models
+namespace ITDecision.Models
 {
     public enum ViberMessageStatus
     {

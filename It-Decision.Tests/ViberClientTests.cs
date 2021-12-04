@@ -4,9 +4,8 @@ using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using ITDecision.Models;
 using ITDecision.Tests.Extensions;
-using ITDecision.Viber;
-using ITDecision.Viber.Models;
 using Moq;
 using Xunit;
 

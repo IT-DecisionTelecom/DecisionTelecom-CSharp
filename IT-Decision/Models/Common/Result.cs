@@ -1,4 +1,4 @@
-namespace ITDecision
+namespace ITDecision.Models.Common
 {
     public class Result<TValue, TError>
     {
