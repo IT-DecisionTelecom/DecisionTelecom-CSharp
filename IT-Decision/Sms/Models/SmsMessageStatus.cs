@@ -1,6 +1,6 @@
 namespace ITDecision.Sms.Models
 {
-    public enum ReceiptDeliveryStatus
+    public enum SmsMessageStatus
     {
         Unknown = 0,
         Delivered = 2,

@@ -1,6 +1,6 @@
 namespace ITDecision.Viber.Models
 {
-    public enum MessageType
+    public enum ViberMessageType
     {
         /// <summary>
         /// Text only (convenient for transactional messages)

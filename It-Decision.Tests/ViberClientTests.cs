@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -28,7 +29,12 @@ namespace ITDecision.Tests
         [Fact]
         public async Task TestSendMessageReturnsMessageIdAsync()
         {
-            var sendMessageResponse = new SendMessageResponse { MessageId = 429 };
+            const int messageId = 429;
+
+            var sendMessageResponse = new Dictionary<string, int>
+            {
+                { "message_id", messageId },
+            };
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
@@ -37,16 +43,16 @@ namespace ITDecision.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await viberClient.SendMessageAsync(new SendMessageRequest());
+            var result = await viberClient.SendMessageAsync(new ViberMessage());
             
             Assert.True(result.Success);
-            Assert.Equal(sendMessageResponse.MessageId, result.Value);
+            Assert.Equal(messageId, result.Value);
         }
         
         [Fact]
         public async Task TestSendMessageReturnsErrorSuccessStatusCodeAsync()
         {
-            var error = new Error
+            var error = new ViberError
             {
                 Name = "Invalid Parameter: source_addr",
                 Message = "Empty parameter or parameter validation error",
@@ -61,7 +67,7 @@ namespace ITDecision.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await viberClient.SendMessageAsync(new SendMessageRequest());
+            var result = await viberClient.SendMessageAsync(new ViberMessage());
             
             Assert.True(result.Failure);
             Assert.NotNull(result.Error);
@@ -74,7 +80,7 @@ namespace ITDecision.Tests
         [Fact]
         public async Task TestSendMessageReturnsErrorNotSuccessStatusCodeAsync()
         {
-            var error = new Error
+            var error = new ViberError
             {
                 Name = "Method Not Allowed",
                 Message = "Method Not Allowed. This URL can only handle the following request methods: POST.",
@@ -89,7 +95,7 @@ namespace ITDecision.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await viberClient.SendMessageAsync(new SendMessageRequest());
+            var result = await viberClient.SendMessageAsync(new ViberMessage());
             
             Assert.True(result.Failure);
             Assert.NotNull(result.Error);
@@ -111,14 +117,21 @@ namespace ITDecision.Tests
             handlerMock.SetupHttpHandlerResponse(response);
 
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                viberClient.SendMessageAsync(new SendMessageRequest()));
+                viberClient.SendMessageAsync(new ViberMessage()));
         }
         
         [Fact]
         public async Task TestGetMessageStatusAsyncReturnsMessageIdAsync()
         {
-            var sendMessageResponse = new GetMessageStatusResponse
-                { MessageId = 429, Status = MessageStatus.Delivered };
+            const int messageId = 429;
+            const ViberMessageStatus messageStatus = ViberMessageStatus.Delivered;
+
+            var sendMessageResponse = new Dictionary<string, int>
+            {
+                { "message_id", messageId },
+                { "status", (int)messageStatus },
+            };
+            
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
@@ -127,16 +140,16 @@ namespace ITDecision.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await viberClient.GetMessageStatusAsync(sendMessageResponse.MessageId);
+            var result = await viberClient.GetMessageStatusAsync(messageId);
             
             Assert.True(result.Success);
-            Assert.Equal(sendMessageResponse.Status, result.Value);
+            Assert.Equal(messageStatus, result.Value);
         }
         
         [Fact]
         public async Task TestGetMessageStatusReturnsErrorSuccessStatusCodeAsync()
         {
-            var error = new Error
+            var error = new ViberError
             {
                 Name = "Invalid Parameter: source_addr",
                 Message = "Empty parameter or parameter validation error",
@@ -164,7 +177,7 @@ namespace ITDecision.Tests
         [Fact]
         public async Task TestGetMessageStatusReturnsErrorNotSuccessStatusCodeAsync()
         {
-            var error = new Error
+            var error = new ViberError
             {
                 Name = "Method Not Allowed",
                 Message = "Method Not Allowed. This URL can only handle the following request methods: POST.",

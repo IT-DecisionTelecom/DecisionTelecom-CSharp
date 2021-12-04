@@ -5,7 +5,7 @@ namespace ITDecision.Viber.Models
     /// <summary>
     /// 
     /// </summary>
-    public class SendMessageRequest
+    public class ViberMessage
     {
         /// <summary>
         /// Message sender (from whom message is sent)
@@ -25,7 +25,7 @@ namespace ITDecision.Viber.Models
         /// Message type
         /// </summary>
         [JsonPropertyName("message_type")]
-        public MessageType MessageType { get; set; }
+        public ViberMessageType MessageType { get; set; }
 
         /// <summary>
         /// Message in the UTF8 format
@@ -61,7 +61,7 @@ namespace ITDecision.Viber.Models
         /// Message sending procedure
         /// </summary>
         [JsonPropertyName("source_type")]
-        public MessageSourceType SourceType { get; set; }
+        public ViberMessageSourceType SourceType { get; set; }
 
         /// <summary>
         /// URL for message status callback

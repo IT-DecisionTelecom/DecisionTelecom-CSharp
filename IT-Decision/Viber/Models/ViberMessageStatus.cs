@@ -1,6 +1,6 @@
 namespace ITDecision.Viber.Models
 {
-    public enum MessageStatus
+    public enum ViberMessageStatus
     {
         Sent = 0,
         Delivered = 1,

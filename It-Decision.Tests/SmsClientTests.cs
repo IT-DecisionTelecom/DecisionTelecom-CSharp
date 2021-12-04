@@ -55,13 +55,13 @@ namespace ITDecision.Tests
             var result = await smsClient.SendMessageAsync(new SmsMessage());
             
             Assert.True(result.Failure);
-            Assert.Equal(ErrorCode.ServerError, result.Error);
+            Assert.Equal(SmsErrorCode.ServerError, result.Error);
         }
         
         [Fact]
         public async Task TestSendMessageReturnsErrorAsync()
         {
-            const ErrorCode expectedErrorCode = ErrorCode.InvalidLoginOrPassword;
+            const SmsErrorCode expectedErrorCode = SmsErrorCode.InvalidLoginOrPassword;
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
@@ -102,7 +102,7 @@ namespace ITDecision.Tests
         [Fact]
         public async Task TestGetMessageDeliveryStatusReturnsStatusCodeAsync()
         {
-            const ReceiptDeliveryStatus expectedDeliveryStatus = ReceiptDeliveryStatus.Delivered;
+            const SmsMessageStatus expectedDeliveryStatus = SmsMessageStatus.Delivered;
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
@@ -120,7 +120,7 @@ namespace ITDecision.Tests
         [Fact]
         public async Task TestGetMessageDeliveryStatusReturnsStatusWithoutCodeAsync()
         {
-            const ReceiptDeliveryStatus expectedDeliveryStatus = ReceiptDeliveryStatus.Unknown;
+            const SmsMessageStatus expectedDeliveryStatus = SmsMessageStatus.Unknown;
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
@@ -148,13 +148,13 @@ namespace ITDecision.Tests
             var result = await smsClient.GetMessageDeliveryStatusAsync(1234);
             
             Assert.True(result.Failure);
-            Assert.Equal(ErrorCode.ServerError, result.Error);
+            Assert.Equal(SmsErrorCode.ServerError, result.Error);
         }
         
         [Fact]
         public async Task TestGetMessageDeliveryStatusReturnsErrorAsync()
         {
-            const ErrorCode expectedErrorCode = ErrorCode.InvalidLoginOrPassword;
+            const SmsErrorCode expectedErrorCode = SmsErrorCode.InvalidLoginOrPassword;
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
@@ -228,13 +228,13 @@ namespace ITDecision.Tests
             var result = await smsClient.GetBalanceAsync();
             
             Assert.True(result.Failure);
-            Assert.Equal(ErrorCode.ServerError, result.Error);
+            Assert.Equal(SmsErrorCode.ServerError, result.Error);
         }
         
         [Fact]
         public async Task TestGetBalanceReturnsErrorAsync()
         {
-            const ErrorCode expectedErrorCode = ErrorCode.InvalidLoginOrPassword;
+            const SmsErrorCode expectedErrorCode = SmsErrorCode.InvalidLoginOrPassword;
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,

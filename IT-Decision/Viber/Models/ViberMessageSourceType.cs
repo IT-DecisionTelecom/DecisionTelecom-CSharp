@@ -1,6 +1,6 @@
 namespace ITDecision.Viber.Models
 {
-    public enum MessageSourceType
+    public enum ViberMessageSourceType
     {
         /// <summary>
         /// Message can have text, picture and button 

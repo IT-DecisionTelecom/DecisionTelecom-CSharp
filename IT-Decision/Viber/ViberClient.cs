@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -30,7 +31,7 @@ namespace ITDecision.Viber
         {
         }
 
-        public async Task<Result<int, Error>> SendMessageAsync(SendMessageRequest request)
+        public async Task<Result<int, ViberError>> SendMessageAsync(ViberMessage request)
         {
             var response = await MakeRequestAsync($"{BaseUrl}/send-viber", request);
             var json = await response.Content.ReadAsStringAsync();
@@ -39,11 +40,10 @@ namespace ITDecision.Viber
             {
                 if (!response.IsSuccessStatusCode || !json.Contains(MessageIdFieldName))
                 {
-                    return JsonSerializer.Deserialize<Error>(json);
+                    return JsonSerializer.Deserialize<ViberError>(json);
                 }
 
-                var message = JsonSerializer.Deserialize<SendMessageResponse>(json);
-                return message.MessageId;
+                return JsonDocument.Parse(json).RootElement.GetProperty("message_id").GetInt32();
             }
             catch (Exception ex)
             {
@@ -52,9 +52,12 @@ namespace ITDecision.Viber
             }
         }
 
-        public async Task<Result<MessageStatus, Error>> GetMessageStatusAsync(int messageId)
+        public async Task<Result<ViberMessageStatus, ViberError>> GetMessageStatusAsync(int messageId)
         {
-            var request = new GetMessageStatusResponse { MessageId = messageId };
+            var request = new Dictionary<string, int>
+            {
+                {"message_id", messageId },
+            };
             var response = await MakeRequestAsync($"{BaseUrl}/receive-viber", request);
             var json = await response.Content.ReadAsStringAsync();
 
@@ -62,11 +65,10 @@ namespace ITDecision.Viber
             {
                 if (!response.IsSuccessStatusCode || !json.Contains(MessageIdFieldName))
                 {
-                    return JsonSerializer.Deserialize<Error>(json);
+                    return JsonSerializer.Deserialize<ViberError>(json);
                 }
-            
-                var message = JsonSerializer.Deserialize<GetMessageStatusResponse>(json);
-                return message.Status;
+
+                return (ViberMessageStatus)JsonDocument.Parse(json).RootElement.GetProperty("status").GetInt32();
             }
             catch (Exception ex)
             {

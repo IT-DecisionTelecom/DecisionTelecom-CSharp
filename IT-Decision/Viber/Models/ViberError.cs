@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace ITDecision.Viber.Models
 {
-    public class Error
+    public class ViberError
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }

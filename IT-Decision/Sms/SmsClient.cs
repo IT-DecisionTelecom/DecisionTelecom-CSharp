@@ -51,7 +51,7 @@ namespace ITDecision.Sms
         /// <param name="message">Sms message to send</param>
         /// <returns>The Id of the submitted SMS</returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public async Task<Result<int, ErrorCode>> SendMessageAsync(SmsMessage message)
+        public async Task<Result<int, SmsErrorCode>> SendMessageAsync(SmsMessage message)
         {
             var requestUri =
                 $"{BaseUrl}/send?login={Login}&password={Password}&phone={message.ReceiverPhone}&sender={message.Sender}&text={message.Text}&dlr={Convert.ToInt16(message.Delivery)}";
@@ -59,7 +59,7 @@ namespace ITDecision.Sms
             var response = await httpClient.GetAsync(requestUri);
             return await GetResultFromHttpResponseMessage(response, OkResultFunc);
 
-            Result<int, ErrorCode> OkResultFunc(string responseContent)
+            Result<int, SmsErrorCode> OkResultFunc(string responseContent)
             {
                 var responseDict = GetDictionaryFromResponseContent(responseContent);
                 return int.Parse(responseDict["msgid"]);
@@ -72,19 +72,19 @@ namespace ITDecision.Sms
         /// <param name="messageId">The Id of the submitted SMS</param>
         /// <returns>SMS delivery status code</returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public async Task<Result<ReceiptDeliveryStatus, ErrorCode>> GetMessageDeliveryStatusAsync(int messageId)
+        public async Task<Result<SmsMessageStatus, SmsErrorCode>> GetMessageDeliveryStatusAsync(int messageId)
         {
             var requestUri = $"{BaseUrl}/state?login={Login}&password={Password}&msgid={messageId}";
             var response = await httpClient.GetAsync(requestUri);
             
             return await GetResultFromHttpResponseMessage(response, OkResultFunc);
 
-            Result<ReceiptDeliveryStatus, ErrorCode> OkResultFunc(string responseContent)
+            Result<SmsMessageStatus, SmsErrorCode> OkResultFunc(string responseContent)
             { 
                 var responseDict = GetDictionaryFromResponseContent(responseContent);
                 return string.IsNullOrEmpty(responseDict["status"])
-                    ? ReceiptDeliveryStatus.Unknown
-                    : (ReceiptDeliveryStatus)int.Parse(responseDict["status"]);
+                    ? SmsMessageStatus.Unknown
+                    : (SmsMessageStatus)int.Parse(responseDict["status"]);
             }
         }
 
@@ -93,14 +93,14 @@ namespace ITDecision.Sms
         /// </summary>
         /// <returns>User balance information</returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public async Task<Result<Balance, ErrorCode>> GetBalanceAsync()
+        public async Task<Result<Balance, SmsErrorCode>> GetBalanceAsync()
         {
             var requestUri = $"{BaseUrl}/balance?login={Login}&password={Password}";
             var response = await httpClient.GetAsync(requestUri);
 
             return await GetResultFromHttpResponseMessage(response, OkResultFunc);
 
-            Result<Balance, ErrorCode> OkResultFunc(string responseContent)
+            Result<Balance, SmsErrorCode> OkResultFunc(string responseContent)
             {
                 var responseDict = GetDictionaryFromResponseContent(responseContent, false);
                 return new Balance
@@ -120,12 +120,12 @@ namespace ITDecision.Sms
         /// <typeparam name="T">Result value type</typeparam>
         /// <returns>Result object with the data from the http request</returns>
         /// <exception cref="InvalidOperationException"></exception>
-        private static async Task<Result<T, ErrorCode>> GetResultFromHttpResponseMessage<T>(HttpResponseMessage responseMessage,
-            Func<string, Result<T, ErrorCode>> okResultFunc)
+        private static async Task<Result<T, SmsErrorCode>> GetResultFromHttpResponseMessage<T>(HttpResponseMessage responseMessage,
+            Func<string, Result<T, SmsErrorCode>> okResultFunc)
         {
             if (!responseMessage.IsSuccessStatusCode)
             {
-                return ErrorCode.ServerError;
+                return SmsErrorCode.ServerError;
             }
 
             var responseContent = await responseMessage.Content.ReadAsStringAsync();
@@ -159,10 +159,10 @@ namespace ITDecision.Sms
             return JsonSerializer.Deserialize<Dictionary<string, string>>(replacedContent);
         }
         
-        private static Result<T, ErrorCode> GetErrorResultFromResponseContent<T>(string responseContent)
+        private static Result<T, SmsErrorCode> GetErrorResultFromResponseContent<T>(string responseContent)
         {
             var responseDict = GetDictionaryFromResponseContent(responseContent);
-            return (ErrorCode)int.Parse(responseDict[ErrorText]);
+            return (SmsErrorCode)int.Parse(responseDict[ErrorText]);
         }
     }
 }

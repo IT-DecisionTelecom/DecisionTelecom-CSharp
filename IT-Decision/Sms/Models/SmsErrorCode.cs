@@ -1,6 +1,6 @@
 namespace ITDecision.Sms.Models
 {
-    public enum ErrorCode
+    public enum SmsErrorCode
     {
         InvalidNumber = 40,
         IncorrectSender = 41,
