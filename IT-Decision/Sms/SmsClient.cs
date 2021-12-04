@@ -48,16 +48,13 @@ namespace ITDecision.Sms
         /// <summary>
         /// Sends SMS message
         /// </summary>
-        /// <param name="phone">Phone number (MSISDN Destination)</param>
-        /// <param name="sender">Message sender. It could be a mobile phone number (including a country code) or an alphanumeric string.</param>
-        /// <param name="text">Message body</param>
-        /// <param name="delivery">True if an answer is needed to obtain the delivery receipt in the future (by message id)</param>
+        /// <param name="message">Sms message to send</param>
         /// <returns>The Id of the submitted SMS</returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public async Task<Result<int, ErrorCode>> SendMessageAsync(string phone, string sender, string text, bool delivery)
+        public async Task<Result<int, ErrorCode>> SendMessageAsync(SmsMessage message)
         {
             var requestUri =
-                $"{BaseUrl}/send?login={Login}&password={Password}&phone={phone}&sender={sender}&text={text}&dlr={Convert.ToInt16(delivery)}";
+                $"{BaseUrl}/send?login={Login}&password={Password}&phone={message.ReceiverPhone}&sender={message.Sender}&text={message.Text}&dlr={Convert.ToInt16(message.Delivery)}";
             
             var response = await httpClient.GetAsync(requestUri);
             return await GetResultFromHttpResponseMessage(response, OkResultFunc);

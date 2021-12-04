@@ -36,7 +36,7 @@ namespace ITDecision.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await smsClient.SendMessageAsync("", "", "", true);
+            var result = await smsClient.SendMessageAsync(new SmsMessage());
             
             Assert.True(result.Success);
             Assert.Equal(expectedMessageId, result.Value);
@@ -52,7 +52,7 @@ namespace ITDecision.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
             
-            var result = await smsClient.SendMessageAsync("", "", "", true);
+            var result = await smsClient.SendMessageAsync(new SmsMessage());
             
             Assert.True(result.Failure);
             Assert.Equal(ErrorCode.ServerError, result.Error);
@@ -70,7 +70,7 @@ namespace ITDecision.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await smsClient.SendMessageAsync("", "", "", true);
+            var result = await smsClient.SendMessageAsync(new SmsMessage());
             
             Assert.True(result.Failure);
             Assert.Equal(expectedErrorCode, result.Error);
@@ -96,7 +96,7 @@ namespace ITDecision.Tests
             handlerMock.SetupHttpHandlerResponse(response);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await smsClient.SendMessageAsync("", "", "", true));
+                await smsClient.SendMessageAsync(new SmsMessage()));
         }
         
         [Fact]
