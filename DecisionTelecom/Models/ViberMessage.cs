@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace ITDecision.Models
+namespace DecisionTelecom.Models
 {
     /// <summary>
     /// 

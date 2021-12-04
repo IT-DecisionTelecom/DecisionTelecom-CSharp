@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IT-Decision", "IT-Decision\IT-Decision.csproj", "{0308374B-F246-452E-94A4-2F04D9FACCC5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DecisionTelecom", "DecisionTelecom\DecisionTelecom.csproj", "{0308374B-F246-452E-94A4-2F04D9FACCC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "It-Decision.Tests", "It-Decision.Tests\It-Decision.Tests.csproj", "{83D5EC74-197B-450E-AF47-06B67D74C03C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DecisionTelecom.Tests", "DecisionTelecom.Tests\DecisionTelecom.Tests.csproj", "{83D5EC74-197B-450E-AF47-06B67D74C03C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

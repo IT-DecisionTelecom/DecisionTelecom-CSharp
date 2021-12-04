@@ -5,10 +5,10 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using ITDecision.Models;
-using ITDecision.Models.Common;
+using DecisionTelecom.Models;
+using DecisionTelecom.Models.Common;
 
-namespace ITDecision
+namespace DecisionTelecom
 {
     public class ViberClient
     {

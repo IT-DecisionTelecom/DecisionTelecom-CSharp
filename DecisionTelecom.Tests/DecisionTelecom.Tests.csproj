@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <RootNamespace>ITDecision.Tests</RootNamespace>
 
         <IsPackable>false</IsPackable>
     </PropertyGroup>
@@ -18,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\IT-Decision\IT-Decision.csproj" />
+      <ProjectReference Include="..\DecisionTelecom\DecisionTelecom.csproj" />
     </ItemGroup>
 
 </Project>

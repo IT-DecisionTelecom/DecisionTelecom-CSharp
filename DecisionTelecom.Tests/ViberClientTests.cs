@@ -4,12 +4,13 @@ using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using ITDecision.Models;
+using DecisionTelecom.Models;
+using ITDecision;
 using ITDecision.Tests.Extensions;
 using Moq;
 using Xunit;
 
-namespace ITDecision.Tests
+namespace DecisionTelecom.Tests
 {
     public class ViberClientTests
     {

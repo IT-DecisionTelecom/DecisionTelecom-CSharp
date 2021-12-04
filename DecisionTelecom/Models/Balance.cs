@@ -1,4 +1,4 @@
-namespace ITDecision.Models
+namespace DecisionTelecom.Models
 {
     /// <summary>
     /// Represents user money balance
