@@ -133,7 +133,7 @@ namespace DecisionTelecom
             try
             {
                 // Return error if it was sent in response. Otherwise, process response content to create result 
-                return responseContent.Contains(ErrorText, StringComparison.OrdinalIgnoreCase)
+                return responseContent.Contains(ErrorText)
                     ? GetErrorResultFromResponseContent<T>(responseContent)
                     : okResultFunc(responseContent);
             }
