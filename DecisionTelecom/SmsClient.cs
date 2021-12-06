@@ -9,9 +9,9 @@ using DecisionTelecom.Models.Common;
 namespace DecisionTelecom
 {
     /// <summary>
-    /// SMS Client
+    /// Client to work with SMS messages
     /// </summary>
-    public class SmsClient// : MessageClient
+    public class SmsClient
     {
         private const string BaseUrl = "https://web.it-decision.com/ru/js";
 
@@ -25,7 +25,7 @@ namespace DecisionTelecom
         
 
         /// <summary>
-        /// Creates new instance of the SmsClient class
+        /// Creates a new instance of the SmsClient class
         /// </summary>
         /// <param name="httpClient">Http client to send http requests</param>
         /// <param name="login">Login to access the system</param>
@@ -49,14 +49,14 @@ namespace DecisionTelecom
         /// <summary>
         /// Sends SMS message
         /// </summary>
-        /// <param name="message">Sms message to send</param>
-        /// <returns>The Id of the submitted SMS</returns>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <param name="message">SMS message to send</param>
+        /// <returns>The Id of the submitted SMS message in case of success or error code otherwise</returns>
+        /// <exception cref="InvalidOperationException">Not possible to parse response received from the server</exception>
         public async Task<Result<int, SmsErrorCode>> SendMessageAsync(SmsMessage message)
         {
             var requestUri =
                 $"{BaseUrl}/send?login={Login}&password={Password}&phone={message.ReceiverPhone}&sender={message.Sender}&text={message.Text}&dlr={Convert.ToInt16(message.Delivery)}";
-            
+
             var response = await httpClient.GetAsync(requestUri);
             return await GetResultFromHttpResponseMessage(response, OkResultFunc);
 
@@ -68,11 +68,11 @@ namespace DecisionTelecom
         }
 
         /// <summary>
-        /// Returns SMS delivery status
+        /// Returns SMS message delivery status
         /// </summary>
         /// <param name="messageId">The Id of the submitted SMS</param>
-        /// <returns>SMS delivery status code</returns>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <returns>SMS message delivery status in case of success or error code otherwise</returns>
+        /// <exception cref="InvalidOperationException">Not possible to parse response received from the server</exception>
         public async Task<Result<SmsMessageStatus, SmsErrorCode>> GetMessageDeliveryStatusAsync(int messageId)
         {
             var requestUri = $"{BaseUrl}/state?login={Login}&password={Password}&msgid={messageId}";
