@@ -51,10 +51,10 @@ namespace DecisionTelecom
         /// <param name="message">Viber message to send</param>
         /// <returns>Id of the sent Viber message in case of success or error information otherwise</returns>
         /// <exception cref="InvalidOperationException">Not possible to parse response received from the server</exception>
-        public async Task<Result<int, ViberError>> SendMessageAsync(ViberMessage message)
+        public async Task<Result<long, ViberError>> SendMessageAsync(ViberMessage message)
         {
-            int OkResponseFunc(string json) =>
-                JsonDocument.Parse(json).RootElement.GetProperty(MessageIdPropertyName).GetInt32();
+            long OkResponseFunc(string json) =>
+                JsonDocument.Parse(json).RootElement.GetProperty(MessageIdPropertyName).GetInt64();
 
             return await ProcessRequestAsync($"{BaseUrl}/receive-viber", message, OkResponseFunc);
         }
@@ -65,9 +65,9 @@ namespace DecisionTelecom
         /// <param name="messageId">Id of the Viber message (sent in the last 5 days)</param>
         /// <returns>Viber message status in case of success or error information otherwise</returns>
         /// <exception cref="InvalidOperationException">Not possible to parse response received from the server</exception>
-        public async Task<Result<ViberMessageResult, ViberError>> GetMessageStatusAsync(int messageId)
+        public async Task<Result<ViberMessageResult, ViberError>> GetMessageStatusAsync(long messageId)
         {
-            var request = new Dictionary<string, int> { { MessageIdPropertyName, messageId } };
+            var request = new Dictionary<string, long> { { MessageIdPropertyName, messageId } };
             ViberMessageResult OkResponseFunc(string json) => JsonSerializer.Deserialize<ViberMessageResult>(json);
 
             return await ProcessRequestAsync($"{BaseUrl}/receive-viber", request, OkResponseFunc);

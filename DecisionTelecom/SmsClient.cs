@@ -56,7 +56,7 @@ namespace DecisionTelecom
         /// <param name="message">SMS message to send</param>
         /// <returns>The Id of the submitted SMS message in case of success or error code otherwise</returns>
         /// <exception cref="InvalidOperationException">Not possible to parse response received from the server</exception>
-        public async Task<Result<int, SmsErrorCode>> SendMessageAsync(SmsMessage message)
+        public async Task<Result<long, SmsErrorCode>> SendMessageAsync(SmsMessage message)
         {
             var requestUri =
                 $"{BaseUrl}/send?login={Login}&password={Password}&phone={message.ReceiverPhone}&sender={message.Sender}&text={message.Text}&dlr={Convert.ToInt16(message.Delivery)}";
@@ -64,8 +64,8 @@ namespace DecisionTelecom
             var response = await httpClient.GetAsync(requestUri);
             return await GetResultFromHttpResponseMessage(response, OkResultFunc);
 
-            Result<int, SmsErrorCode> OkResultFunc(string responseContent) =>
-                int.Parse(GetValueFromListResponseContent(responseContent, MessageIdPropertyName));
+            Result<long, SmsErrorCode> OkResultFunc(string responseContent) =>
+                long.Parse(GetValueFromListResponseContent(responseContent, MessageIdPropertyName));
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace DecisionTelecom
         /// <param name="messageId">The Id of the submitted SMS</param>
         /// <returns>SMS message delivery status in case of success or error code otherwise</returns>
         /// <exception cref="InvalidOperationException">Not possible to parse response received from the server</exception>
-        public async Task<Result<SmsMessageStatus, SmsErrorCode>> GetMessageDeliveryStatusAsync(int messageId)
+        public async Task<Result<SmsMessageStatus, SmsErrorCode>> GetMessageDeliveryStatusAsync(long messageId)
         {
             var requestUri = $"{BaseUrl}/state?login={Login}&password={Password}&msgid={messageId}";
             var response = await httpClient.GetAsync(requestUri);
@@ -136,7 +136,7 @@ namespace DecisionTelecom
             {
                 // Return error if it was sent in response. Otherwise, process response content to create result 
                 return responseContent.Contains(ErrorPropertyName)
-                    ? (SmsErrorCode)int.Parse(GetValueFromListResponseContent(responseContent, ErrorPropertyName))
+                    ? (SmsErrorCode)long.Parse(GetValueFromListResponseContent(responseContent, ErrorPropertyName))
                     : okResultFunc(responseContent);
             }
             catch (Exception ex)
