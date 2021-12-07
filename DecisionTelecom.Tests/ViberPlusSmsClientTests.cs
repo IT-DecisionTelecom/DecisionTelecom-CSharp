@@ -11,18 +11,18 @@ using Xunit;
 
 namespace DecisionTelecom.Tests
 {
-    public class ViberClientTests
+    public class ViberPlusSmsClientTests
     {
         private readonly Mock<HttpMessageHandler> handlerMock;
 
-        private readonly ViberClient viberClient;
+        private readonly ViberPlusSmsClient viberPlusSmsClient;
 
-        public ViberClientTests()
+        public ViberPlusSmsClientTests()
         {
             handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var httpClient = new HttpClient(handlerMock.Object);
 
-            viberClient = new ViberClient(httpClient, string.Empty);
+            viberPlusSmsClient = new ViberPlusSmsClient(httpClient, string.Empty);
         }
         
         [Fact]
@@ -42,7 +42,7 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await viberClient.SendMessageAsync(new ViberMessage());
+            var result = await viberPlusSmsClient.SendMessageAsync(new ViberMessage());
             
             Assert.True(result.Success);
             Assert.Equal(messageId, result.Value);
@@ -66,7 +66,7 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await viberClient.SendMessageAsync(new ViberMessage());
+            var result = await viberPlusSmsClient.SendMessageAsync(new ViberMessage());
             
             Assert.True(result.Failure);
             Assert.NotNull(result.Error);
@@ -94,7 +94,7 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await viberClient.SendMessageAsync(new ViberMessage());
+            var result = await viberPlusSmsClient.SendMessageAsync(new ViberMessage());
             
             Assert.True(result.Failure);
             Assert.NotNull(result.Error);
@@ -116,7 +116,7 @@ namespace DecisionTelecom.Tests
             handlerMock.SetupHttpHandlerResponse(response);
 
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                viberClient.SendMessageAsync(new ViberMessage()));
+                viberPlusSmsClient.SendMessageAsync(new ViberMessage()));
         }
         
         [Fact]
@@ -139,7 +139,7 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await viberClient.GetMessageStatusAsync(messageId);
+            var result = await viberPlusSmsClient.GetMessageStatusAsync(messageId);
             
             Assert.True(result.Success);
             Assert.Equal(messageId, result.Value.ViberMessageId);
@@ -164,7 +164,7 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await viberClient.GetMessageStatusAsync(429);
+            var result = await viberPlusSmsClient.GetMessageStatusAsync(429);
             
             Assert.True(result.Failure);
             Assert.NotNull(result.Error);
@@ -192,7 +192,7 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await viberClient.GetMessageStatusAsync(429);
+            var result = await viberPlusSmsClient.GetMessageStatusAsync(429);
             
             Assert.True(result.Failure);
             Assert.NotNull(result.Error);
@@ -213,7 +213,7 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => viberClient.GetMessageStatusAsync(429));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => viberPlusSmsClient.GetMessageStatusAsync(429));
         }
     }
 }
