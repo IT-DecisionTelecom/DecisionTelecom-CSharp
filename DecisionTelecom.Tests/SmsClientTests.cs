@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DecisionTelecom.Models;
-using ITDecision;
 using ITDecision.Tests.Extensions;
 using Moq;
 using Xunit;
@@ -65,7 +64,7 @@ namespace DecisionTelecom.Tests
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent($"[\"error\",\"{(int)expectedErrorCode}\"]"),
+                Content = new StringContent($"[\"error\",{(int)expectedErrorCode}]"),
             };
             
             handlerMock.SetupHttpHandlerResponse(response);
@@ -79,7 +78,7 @@ namespace DecisionTelecom.Tests
         [Theory]
         [InlineData("[\"error\",\"InvalidNumber\"]")]
         [InlineData("[\"error\",\"\"]")]
-        [InlineData("[\"err\",\"44\"]")]
+        [InlineData("[\"err\",44]")]
         [InlineData("[\"msg\",\"31885463\"]")]
         [InlineData("[\"msgid\",\"\"]")]
         [InlineData("[\"msgid\"]")]
@@ -106,7 +105,7 @@ namespace DecisionTelecom.Tests
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent($"[\"status\",\"{(int)expectedDeliveryStatus}\"]"),
+                Content = new StringContent($"[\"status\",{(int)expectedDeliveryStatus}]"),
             };
             
             handlerMock.SetupHttpHandlerResponse(response);
@@ -158,7 +157,7 @@ namespace DecisionTelecom.Tests
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent($"[\"error\",\"{(int)expectedErrorCode}\"]"),
+                Content = new StringContent($"[\"error\",{(int)expectedErrorCode}]"),
             };
             
             handlerMock.SetupHttpHandlerResponse(response);
@@ -238,7 +237,7 @@ namespace DecisionTelecom.Tests
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent($"[\"error\",\"{(int)expectedErrorCode}\"]"),
+                Content = new StringContent($"[\"error\",{(int)expectedErrorCode}]"),
             };
             
             handlerMock.SetupHttpHandlerResponse(response);
@@ -252,7 +251,7 @@ namespace DecisionTelecom.Tests
         [Theory]
         [InlineData("[\"error\",\"InvalidNumber\"]")]
         [InlineData("[\"error\",\"\"]")]
-        [InlineData("[\"err\",\"44\"]")]
+        [InlineData("[\"err\",44]")]
         [InlineData("[\"balance\":\"4\"]")]
         [InlineData("[\"bal\",\"4\"]")]
         [InlineData("[\"balance\":\"4\",\"credit\":\"3\"]")]

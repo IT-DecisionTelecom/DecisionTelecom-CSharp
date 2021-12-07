@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -15,14 +16,17 @@ namespace DecisionTelecom
     {
         private const string BaseUrl = "https://web.it-decision.com/ru/js";
 
-        private const string ErrorText = "error";
+        private const string ErrorPropertyName = "error";
+
+        private const string MessageIdPropertyName = "msgid";
+
+        private const string StatusPropertyName = "status";
 
         private readonly HttpClient httpClient;
 
         public string Login { get; }
 
         public string Password { get; }
-        
 
         /// <summary>
         /// Creates a new instance of the SmsClient class
@@ -60,11 +64,8 @@ namespace DecisionTelecom
             var response = await httpClient.GetAsync(requestUri);
             return await GetResultFromHttpResponseMessage(response, OkResultFunc);
 
-            Result<int, SmsErrorCode> OkResultFunc(string responseContent)
-            {
-                var responseDict = GetDictionaryFromResponseContent(responseContent);
-                return int.Parse(responseDict["msgid"]);
-            }
+            Result<int, SmsErrorCode> OkResultFunc(string responseContent) =>
+                int.Parse(GetValueFromListResponseContent(responseContent, MessageIdPropertyName));
         }
 
         /// <summary>
@@ -77,15 +78,15 @@ namespace DecisionTelecom
         {
             var requestUri = $"{BaseUrl}/state?login={Login}&password={Password}&msgid={messageId}";
             var response = await httpClient.GetAsync(requestUri);
-            
+
             return await GetResultFromHttpResponseMessage(response, OkResultFunc);
 
             Result<SmsMessageStatus, SmsErrorCode> OkResultFunc(string responseContent)
-            { 
-                var responseDict = GetDictionaryFromResponseContent(responseContent);
-                return string.IsNullOrEmpty(responseDict["status"])
+            {
+                var responseValue = GetValueFromListResponseContent(responseContent, StatusPropertyName);
+                return string.IsNullOrEmpty(responseValue)
                     ? SmsMessageStatus.Unknown
-                    : (SmsMessageStatus)int.Parse(responseDict["status"]);
+                    : (SmsMessageStatus)int.Parse(responseValue);
             }
         }
 
@@ -103,7 +104,7 @@ namespace DecisionTelecom
 
             Result<Balance, SmsErrorCode> OkResultFunc(string responseContent)
             {
-                var responseDict = GetDictionaryFromResponseContent(responseContent, false);
+                var responseDict = GetDictionaryFromResponseContent(responseContent);
                 return new Balance
                 {
                     BalanceAmount = double.Parse(responseDict["balance"]),
@@ -121,7 +122,8 @@ namespace DecisionTelecom
         /// <typeparam name="T">Result value type</typeparam>
         /// <returns>Result object with the data from the http request</returns>
         /// <exception cref="InvalidOperationException"></exception>
-        private static async Task<Result<T, SmsErrorCode>> GetResultFromHttpResponseMessage<T>(HttpResponseMessage responseMessage,
+        private static async Task<Result<T, SmsErrorCode>> GetResultFromHttpResponseMessage<T>(
+            HttpResponseMessage responseMessage,
             Func<string, Result<T, SmsErrorCode>> okResultFunc)
         {
             if (!responseMessage.IsSuccessStatusCode)
@@ -133,37 +135,42 @@ namespace DecisionTelecom
             try
             {
                 // Return error if it was sent in response. Otherwise, process response content to create result 
-                return responseContent.Contains(ErrorText)
-                    ? GetErrorResultFromResponseContent<T>(responseContent)
+                return responseContent.Contains(ErrorPropertyName)
+                    ? (SmsErrorCode)int.Parse(GetValueFromListResponseContent(responseContent, ErrorPropertyName))
                     : okResultFunc(responseContent);
             }
             catch (Exception ex)
             {
                 throw new InvalidOperationException(
-                    $"Unable to process service response. Please contact support. Response content: {responseContent}", ex);
+                    $"Unable to process service response. Please contact support. Response content: {responseContent}",
+                    ex);
             }
         }
 
-        private static Dictionary<string, string> GetDictionaryFromResponseContent(string responseContent,
-            bool replaceComma = true)
+        private static Dictionary<string, string> GetDictionaryFromResponseContent(string responseContent)
         {
             // Replace symbols to be able to parse response string as dictionary 
             var replacedContent = responseContent
                 .Replace("[", "{")
                 .Replace("]", "}");
 
-            if (replaceComma)
-            {
-                replacedContent = replacedContent.Replace(",", ":");
-            }
-            
             return JsonSerializer.Deserialize<Dictionary<string, string>>(replacedContent);
         }
-        
-        private static Result<T, SmsErrorCode> GetErrorResultFromResponseContent<T>(string responseContent)
+
+        private static string GetValueFromListResponseContent(string responseContent, string keyPropertyName)
         {
-            var responseDict = GetDictionaryFromResponseContent(responseContent);
-            return (SmsErrorCode)int.Parse(responseDict[ErrorText]);
+            var responseList = responseContent
+                .Trim('[', ']')
+                .Split(new[] { "," }, StringSplitOptions.None)
+                .Select(x => x.Trim('\"'))
+                .ToList();
+            
+            if (!responseList[0].Equals(keyPropertyName))
+            {
+                throw new ArgumentException($"Unknown key '{responseList[0]}' in the response.");
+            }
+
+            return responseList[1];
         }
     }
 }
