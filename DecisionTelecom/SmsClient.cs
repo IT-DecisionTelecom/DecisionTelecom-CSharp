@@ -55,7 +55,7 @@ namespace DecisionTelecom
         /// </summary>
         /// <param name="message">SMS message to send</param>
         /// <returns>The Id of the submitted SMS message in case of success or error code otherwise</returns>
-        /// <exception cref="InvalidOperationException">Not possible to parse response received from the server</exception>
+        /// <exception cref="InvalidOperationException">Not possible to parse response from the server</exception>
         public async Task<Result<long, SmsErrorCode>> SendMessageAsync(SmsMessage message)
         {
             var requestUri =
@@ -64,7 +64,7 @@ namespace DecisionTelecom
             var response = await httpClient.GetAsync(requestUri);
             return await GetResultFromHttpResponseMessage(response, OkResultFunc);
 
-            Result<long, SmsErrorCode> OkResultFunc(string responseContent) =>
+            long OkResultFunc(string responseContent) =>
                 long.Parse(GetValueFromListResponseContent(responseContent, MessageIdPropertyName));
         }
 
@@ -73,7 +73,7 @@ namespace DecisionTelecom
         /// </summary>
         /// <param name="messageId">The Id of the submitted SMS</param>
         /// <returns>SMS message delivery status in case of success or error code otherwise</returns>
-        /// <exception cref="InvalidOperationException">Not possible to parse response received from the server</exception>
+        /// <exception cref="InvalidOperationException">Not possible to parse response from the server</exception>
         public async Task<Result<SmsMessageStatus, SmsErrorCode>> GetMessageDeliveryStatusAsync(long messageId)
         {
             var requestUri = $"{BaseUrl}/state?login={Login}&password={Password}&msgid={messageId}";
@@ -81,7 +81,7 @@ namespace DecisionTelecom
 
             return await GetResultFromHttpResponseMessage(response, OkResultFunc);
 
-            Result<SmsMessageStatus, SmsErrorCode> OkResultFunc(string responseContent)
+            SmsMessageStatus OkResultFunc(string responseContent)
             {
                 var responseValue = GetValueFromListResponseContent(responseContent, StatusPropertyName);
                 return string.IsNullOrEmpty(responseValue)
@@ -94,7 +94,7 @@ namespace DecisionTelecom
         /// Returns balance information
         /// </summary>
         /// <returns>User balance information</returns>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="InvalidOperationException">Not possible to parse response from the server</exception>
         public async Task<Result<Balance, SmsErrorCode>> GetBalanceAsync()
         {
             var requestUri = $"{BaseUrl}/balance?login={Login}&password={Password}";
@@ -102,7 +102,7 @@ namespace DecisionTelecom
 
             return await GetResultFromHttpResponseMessage(response, OkResultFunc);
 
-            Result<Balance, SmsErrorCode> OkResultFunc(string responseContent)
+            Balance OkResultFunc(string responseContent)
             {
                 var responseDict = GetDictionaryFromResponseContent(responseContent);
                 return new Balance
@@ -121,10 +121,10 @@ namespace DecisionTelecom
         /// <param name="okResultFunc">Function to create Result object in case when http request was successful</param>
         /// <typeparam name="T">Result value type</typeparam>
         /// <returns>Result object with the data from the http request</returns>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="InvalidOperationException">Not possible to parse response from the server</exception>
         private static async Task<Result<T, SmsErrorCode>> GetResultFromHttpResponseMessage<T>(
             HttpResponseMessage responseMessage,
-            Func<string, Result<T, SmsErrorCode>> okResultFunc)
+            Func<string, T> okResultFunc)
         {
             if (!responseMessage.IsSuccessStatusCode)
             {
