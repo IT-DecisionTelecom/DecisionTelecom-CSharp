@@ -56,7 +56,7 @@ namespace DecisionTelecom
             long OkResponseFunc(string json) =>
                 JsonDocument.Parse(json).RootElement.GetProperty(MessageIdPropertyName).GetInt64();
 
-            return await ProcessRequestAsync($"{BaseUrl}/receive-viber", message, OkResponseFunc);
+            return await ProcessRequestAsync($"{BaseUrl}/send-viber", message, OkResponseFunc);
         }
 
         /// <summary>
@@ -78,15 +78,16 @@ namespace DecisionTelecom
             var response = await MakeRequestAsync(url, request);
             var json = await response.Content.ReadAsStringAsync();
 
-            static bool IsErrorResponse(string responseJson) =>
-                responseJson.Contains("name") &&
-                responseJson.Contains("message") &&
-                responseJson.Contains("code") &&
-                responseJson.Contains("status");
-            
             try
             {
-                if (!response.IsSuccessStatusCode || IsErrorResponse(json))
+                // Process unsuccessful status codes
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new ViberError { Status = (int)response.StatusCode, Name = response.StatusCode.ToString() };
+                }
+
+                // If response contains "name", "message", "code" and "status" words, treat it as an ViberError   
+                if (json.Contains("name") && json.Contains("message") && json.Contains("code") && json.Contains("status"))
                 {
                     return JsonSerializer.Deserialize<ViberError>(json);
                 }
@@ -110,6 +111,7 @@ namespace DecisionTelecom
             request.Headers.Authorization = new AuthenticationHeaderValue("Basic", accessKeyBase64);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
             request.Content = new StringContent(JsonSerializer.Serialize(requestContent));
+            request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
 
             return await httpClient.SendAsync(request);
         }

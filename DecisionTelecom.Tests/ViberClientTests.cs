@@ -49,7 +49,7 @@ namespace DecisionTelecom.Tests
         }
         
         [Fact]
-        public async Task TestSendMessageReturnsErrorSuccessStatusCodeAsync()
+        public async Task TestSendMessageReturnsErrorAsync()
         {
             var error = new ViberError
             {
@@ -77,19 +77,17 @@ namespace DecisionTelecom.Tests
         }
         
         [Fact]
-        public async Task TestSendMessageReturnsErrorNotSuccessStatusCodeAsync()
+        public async Task TestSendMessageReturnsNotSuccessStatusCodeAsync()
         {
             var error = new ViberError
             {
-                Name = "Method Not Allowed",
-                Message = "Method Not Allowed. This URL can only handle the following request methods: POST.",
-                Code = 0,
-                Status = 405,
+                Name = "Unauthorized",
+                Status = 401,
             };
             var response = new HttpResponseMessage
             {
-                StatusCode = HttpStatusCode.MethodNotAllowed,
-                Content = new StringContent(JsonSerializer.Serialize(error)),
+                StatusCode = HttpStatusCode.Unauthorized,
+                Content = new StringContent(JsonSerializer.Serialize("Some response message text")),
             };
             
             handlerMock.SetupHttpHandlerResponse(response);
@@ -99,8 +97,6 @@ namespace DecisionTelecom.Tests
             Assert.True(result.Failure);
             Assert.NotNull(result.Error);
             Assert.Equal(error.Name, result.Error.Name);
-            Assert.Equal(error.Message, result.Error.Message);
-            Assert.Equal(error.Code, result.Error.Code);
             Assert.Equal(error.Status, result.Error.Status);
         }
         
@@ -147,7 +143,7 @@ namespace DecisionTelecom.Tests
         }
         
         [Fact]
-        public async Task TestGetMessageStatusReturnsErrorSuccessStatusCodeAsync()
+        public async Task TestGetMessageStatusReturnsErrorAsync()
         {
             var error = new ViberError
             {
@@ -175,19 +171,17 @@ namespace DecisionTelecom.Tests
         }
         
         [Fact]
-        public async Task TestGetMessageStatusReturnsErrorNotSuccessStatusCodeAsync()
+        public async Task TestGetMessageStatusReturnsNotSuccessStatusCodeAsync()
         {
             var error = new ViberError
             {
-                Name = "Method Not Allowed",
-                Message = "Method Not Allowed. This URL can only handle the following request methods: POST.",
-                Code = 0,
-                Status = 405,
+                Name = "Unauthorized",
+                Status = 401,
             };
             var response = new HttpResponseMessage
             {
-                StatusCode = HttpStatusCode.MethodNotAllowed,
-                Content = new StringContent(JsonSerializer.Serialize(error)),
+                StatusCode = HttpStatusCode.Unauthorized,
+                Content = new StringContent(JsonSerializer.Serialize("Some error message text")),
             };
             
             handlerMock.SetupHttpHandlerResponse(response);
@@ -197,8 +191,6 @@ namespace DecisionTelecom.Tests
             Assert.True(result.Failure);
             Assert.NotNull(result.Error);
             Assert.Equal(error.Name, result.Error.Name);
-            Assert.Equal(error.Message, result.Error.Message);
-            Assert.Equal(error.Code, result.Error.Code);
             Assert.Equal(error.Status, result.Error.Status);
         }
         
