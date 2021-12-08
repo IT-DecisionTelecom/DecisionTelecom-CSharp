@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DecisionTelecom.Models;
-using ITDecision.Tests.Extensions;
+using DecisionTelecom.Tests.Extensions;
 using Moq;
 using Xunit;
 

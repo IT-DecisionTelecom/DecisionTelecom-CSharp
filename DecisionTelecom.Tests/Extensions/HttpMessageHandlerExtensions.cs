@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Moq;
 using Moq.Protected;
 
-namespace ITDecision.Tests.Extensions
+namespace DecisionTelecom.Tests.Extensions
 {
     public static class HttpMessageHandlerExtensions
     {
