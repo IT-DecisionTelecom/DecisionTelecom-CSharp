@@ -78,9 +78,15 @@ namespace DecisionTelecom
             var response = await MakeRequestAsync(url, request);
             var json = await response.Content.ReadAsStringAsync();
 
+            static bool IsErrorResponse(string responseJson) =>
+                responseJson.Contains("name") &&
+                responseJson.Contains("message") &&
+                responseJson.Contains("code") &&
+                responseJson.Contains("status");
+            
             try
             {
-                if (!response.IsSuccessStatusCode || !json.Contains(MessageIdPropertyName))
+                if (!response.IsSuccessStatusCode || IsErrorResponse(json))
                 {
                     return JsonSerializer.Deserialize<ViberError>(json);
                 }
