@@ -42,22 +42,6 @@ namespace DecisionTelecom.Tests
         }
 
         [Fact]
-        public async Task TestSendMessageReturnsNotSuccessStatusCodeAsync()
-        {
-            var response = new HttpResponseMessage
-            {
-                StatusCode = HttpStatusCode.InternalServerError,
-            };
-            
-            handlerMock.SetupHttpHandlerResponse(response);
-            
-            var result = await smsClient.SendMessageAsync(new SmsMessage());
-            
-            Assert.True(result.Failure);
-            Assert.Equal(SmsErrorCode.ServerError, result.Error);
-        }
-        
-        [Fact]
         public async Task TestSendMessageReturnsErrorAsync()
         {
             const SmsErrorCode expectedErrorCode = SmsErrorCode.InvalidLoginOrPassword;
@@ -133,23 +117,7 @@ namespace DecisionTelecom.Tests
             Assert.True(result.Success);
             Assert.Equal(expectedDeliveryStatus, result.Value);
         }
-        
-        [Fact]
-        public async Task TestGetMessageDeliveryStatusReturnsNotSuccessStatusCodeAsync()
-        {
-            var response = new HttpResponseMessage
-            {
-                StatusCode = HttpStatusCode.InternalServerError,
-            };
-            
-            handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await smsClient.GetMessageDeliveryStatusAsync(1234);
-            
-            Assert.True(result.Failure);
-            Assert.Equal(SmsErrorCode.ServerError, result.Error);
-        }
-        
         [Fact]
         public async Task TestGetMessageDeliveryStatusReturnsErrorAsync()
         {
@@ -213,23 +181,7 @@ namespace DecisionTelecom.Tests
             Assert.Equal(expectedCredit, result.Value.CreditAmount);
             Assert.Equal(expectedCurrency, result.Value.Currency);
         }
-        
-        [Fact]
-        public async Task TestGetBalanceReturnsNotSuccessStatusCodeAsync()
-        {
-            var response = new HttpResponseMessage
-            {
-                StatusCode = HttpStatusCode.InternalServerError,
-            };
-            
-            handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await smsClient.GetBalanceAsync();
-            
-            Assert.True(result.Failure);
-            Assert.Equal(SmsErrorCode.ServerError, result.Error);
-        }
-        
         [Fact]
         public async Task TestGetBalanceReturnsErrorAsync()
         {

@@ -12,6 +12,6 @@ namespace DecisionTelecom.Models
         EmptyLogin = 47,
         EmptyPassword = 48,
         NotEnoughMoney = 49,
-        ServerError = 50,
+        AuthorizationError = 50,
     }
 }

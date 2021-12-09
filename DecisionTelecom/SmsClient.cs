@@ -126,11 +126,6 @@ namespace DecisionTelecom
             HttpResponseMessage responseMessage,
             Func<string, T> okResultFunc)
         {
-            if (!responseMessage.IsSuccessStatusCode)
-            {
-                return SmsErrorCode.ServerError;
-            }
-
             var responseContent = await responseMessage.Content.ReadAsStringAsync();
             try
             {
