@@ -1,17 +1,23 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+using System.Threading.Tasks;
 
 namespace DecisionTelecom.Examples
 {
-    public class Program
+    public static class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            // SMS client examples
+            await SmsClientExample.SendMessageAsync();
+            await SmsClientExample.GetMessageStatusAsync(31885463);
+            await SmsClientExample.GetBalanceAsync();
+            
+            // Viber client examples
+            await ViberClientExample.SendMessageAsync();
+            await ViberClientExample.GetMessageStatusAsync(429);
+            
+            // ViberPlusSms client examples
+            await ViberPlusSmsClientExample.SendMessageAsync();
+            await ViberPlusSmsClientExample.GetMessageStatusAsync(429);
         }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
     }
 }
