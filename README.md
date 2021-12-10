@@ -3,6 +3,9 @@ IT-Decision Telecom .NET SDK
 
 Convenient .NET client for IT-Decision Telecom messaging API.
 
+[![test](https://github.com/IT-DecisionTelecom/DecisionTelecom-CSharp/actions/workflows/test.yml/badge.svg)](https://github.com/IT-DecisionTelecom/DecisionTelecom-CSharp/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Requirements
 -----
 
