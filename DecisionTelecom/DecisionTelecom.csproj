@@ -9,6 +9,9 @@
         <Copyright>Copyright ©2021</Copyright>
         <RepositoryType>git</RepositoryType>
         <NeutralLanguage>en</NeutralLanguage>
+        <RepositoryUrl>https://github.com/IT-DecisionTelecom/DecisionTelecom-CSharp</RepositoryUrl>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageProjectUrl>https://github.com/IT-DecisionTelecom/DecisionTelecom-CSharp</PackageProjectUrl>
     </PropertyGroup>
 
     <ItemGroup>
