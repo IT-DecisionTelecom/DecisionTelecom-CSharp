@@ -14,6 +14,6 @@ jobs:
       with:
         dotnet-version: 3.1.x
     - name: Test with dotnet
-      run: dotnet test
+      run: dotnet test DecisionTelecom.Tests  
     - name: Build with dotnet
-      run: dotnet build --configuration Release
+      run: dotnet build DecisionTelecom --configuration Release
