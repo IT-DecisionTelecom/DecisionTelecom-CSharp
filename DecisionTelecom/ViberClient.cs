@@ -105,15 +105,16 @@ namespace DecisionTelecom
         {
             var accessKeyBytes = Encoding.UTF8.GetBytes(AccessKey);
             var accessKeyBase64 = Convert.ToBase64String(accessKeyBytes);
-            
-            using var request = new HttpRequestMessage(HttpMethod.Post, url);
 
-            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", accessKeyBase64);
-            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
-            request.Content = new StringContent(JsonSerializer.Serialize(requestContent));
-            request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
+            using (var request = new HttpRequestMessage(HttpMethod.Post, url))
+            {
+                request.Headers.Authorization = new AuthenticationHeaderValue("Basic", accessKeyBase64);
+                request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+                request.Content = new StringContent(JsonSerializer.Serialize(requestContent));
+                request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
 
-            return await httpClient.SendAsync(request);
+                return await httpClient.SendAsync(request);
+            }
         }
     }
 }

@@ -131,7 +131,7 @@ namespace DecisionTelecom
             {
                 // Return error if it was sent in response. Otherwise, process response content to create result 
                 return responseContent.Contains(ErrorPropertyName)
-                    ? (SmsErrorCode)long.Parse(GetValueFromListResponseContent(responseContent, ErrorPropertyName))
+                    ? Result<T, SmsErrorCode>.Fail<T>((SmsErrorCode)long.Parse(GetValueFromListResponseContent(responseContent, ErrorPropertyName)))
                     : okResultFunc(responseContent);
             }
             catch (Exception ex)
