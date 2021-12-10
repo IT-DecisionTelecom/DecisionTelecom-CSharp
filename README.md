@@ -58,7 +58,7 @@ SmsClient methods return errors in form of the error code. Here are all possible
 - 47 - Empty login
 - 48 - Empty password
 - 49 - Not enough money to send a message
-- 50 - Internal server error
+- 50 - Authentication error
 
 #### Viber errors
 ViberClient and ViberPlusSmsClient methods return errors in form of class with the `Name`, `Message`, `Code` and `Status` properties.
