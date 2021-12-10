@@ -12,6 +12,7 @@
         <RepositoryUrl>https://github.com/IT-DecisionTelecom/DecisionTelecom-CSharp</RepositoryUrl>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageProjectUrl>https://github.com/IT-DecisionTelecom/DecisionTelecom-CSharp</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
     <ItemGroup>
