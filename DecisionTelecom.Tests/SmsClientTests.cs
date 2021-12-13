@@ -204,13 +204,8 @@ namespace DecisionTelecom.Tests
         [InlineData("[\"error\",\"InvalidNumber\"]")]
         [InlineData("[\"error\",\"\"]")]
         [InlineData("[\"err\",44]")]
-        [InlineData("[\"balance\":\"4\"]")]
-        [InlineData("[\"bal\",\"4\"]")]
-        [InlineData("[\"balance\":\"4\",\"credit\":\"3\"]")]
-        [InlineData("[\"balance\":\"4\",\"cred\":\"3\"]")]
-        [InlineData("[\"balance\":\"4\",\"credit\":\"3\",\"curr\":\"\"]")]
-        [InlineData("[\"error\"]")]
-        [InlineData("[]")]
+        [InlineData("[\"bal\",\"4\"]")]        
+        [InlineData("[\"error\"]")]        
         public async Task TestGetBalanceReturnsUnprocessableResponseAsync(string responseContent)
         {
             var response = new HttpResponseMessage
@@ -222,6 +217,65 @@ namespace DecisionTelecom.Tests
             handlerMock.SetupHttpHandlerResponse(response);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await smsClient.GetBalanceAsync());
+        }
+
+        [Theory]
+        [InlineData("[\"balance\":\"4\"]")]
+        [InlineData("[\"balance\":\"4\",\"cred\":\"3\"]")]
+        public async Task TestGetBalanceReturnsOnlyBalanceAsync(string responseContent)
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(responseContent),
+            };
+            
+            handlerMock.SetupHttpHandlerResponse(response);
+
+            var result = await smsClient.GetBalanceAsync();
+            Assert.True(result.Success);
+            Assert.NotEqual(0, result.Value.BalanceAmount);
+            Assert.Equal(0, result.Value.CreditAmount);
+            Assert.Null(result.Value.Currency);            
+        }
+
+        [Theory]
+        [InlineData("[\"credit\":\"4\"]")]        
+        [InlineData("[\"balan\":\"4\",\"credit\":\"3\"]")]
+        public async Task TestGetBalanceReturnsOnlyCreditAsync(string responseContent)
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(responseContent),
+            };
+            
+            handlerMock.SetupHttpHandlerResponse(response);
+
+            var result = await smsClient.GetBalanceAsync();
+            Assert.True(result.Success);
+            Assert.Equal(0, result.Value.BalanceAmount);
+            Assert.NotEqual(0, result.Value.CreditAmount);
+            Assert.Null(result.Value.Currency);            
+        }
+
+        [Theory]
+        [InlineData("[]")]
+        public async Task TestGetBalanceReturnsEmptyResultAsync(string responseContent)
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(responseContent),
+            };
+            
+            handlerMock.SetupHttpHandlerResponse(response);
+
+            var result = await smsClient.GetBalanceAsync();
+            Assert.True(result.Success);
+            Assert.Equal(0, result.Value.BalanceAmount);
+            Assert.Equal(0, result.Value.CreditAmount);
+            Assert.Null(result.Value.Currency);            
         }
     }
 }

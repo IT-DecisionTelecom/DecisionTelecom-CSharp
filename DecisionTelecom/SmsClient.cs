@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DecisionTelecom.Models;
 using DecisionTelecom.Models.Common;
@@ -104,13 +104,13 @@ namespace DecisionTelecom
 
             Balance OkResultFunc(string responseContent)
             {
-                var responseDict = GetDictionaryFromResponseContent(responseContent);
-                return new Balance
-                {
-                    BalanceAmount = double.Parse(responseDict["balance"]),
-                    CreditAmount = double.Parse(responseDict["credit"]),
-                    Currency = responseDict["currency"],
-                };
+                // Replace symbols to be able to parse response string as json
+                // Regexp removes quotation marks ("") around the numbers, so they could be parsed as float
+                var regex = new Regex("\"([-+]?[0-9]*\\.?[0-9]+)\"");
+                var replacedContent = responseContent.Replace("[", "{").Replace("]", "}");
+                replacedContent = regex.Replace(replacedContent, "$1");
+
+                return JsonSerializer.Deserialize<Balance>(replacedContent);
             }
         }
 
@@ -140,16 +140,6 @@ namespace DecisionTelecom
                     $"Unable to process service response. Please contact support. Response content: {responseContent}",
                     ex);
             }
-        }
-
-        private static Dictionary<string, string> GetDictionaryFromResponseContent(string responseContent)
-        {
-            // Replace symbols to be able to parse response string as dictionary 
-            var replacedContent = responseContent
-                .Replace("[", "{")
-                .Replace("]", "}");
-
-            return JsonSerializer.Deserialize<Dictionary<string, string>>(replacedContent);
         }
 
         private static string GetValueFromListResponseContent(string responseContent, string keyPropertyName)
