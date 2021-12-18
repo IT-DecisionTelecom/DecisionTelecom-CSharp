@@ -42,6 +42,23 @@ namespace DecisionTelecom.Tests
         }
 
         [Fact]
+        public async Task TestSendMessageReturnsEmptyMessageIdAsync()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent($"[\"msgid\",\"\"]"),
+            };
+            
+            handlerMock.SetupHttpHandlerResponse(response);
+
+            var result = await smsClient.SendMessageAsync(new SmsMessage());
+            
+            Assert.True(result.Failure);
+            Assert.Equal(SmsErrorCode.IncorrectJson, result.Error);
+        }
+
+        [Fact]
         public async Task TestSendMessageReturnsErrorAsync()
         {
             const SmsErrorCode expectedErrorCode = SmsErrorCode.InvalidLoginOrPassword;
