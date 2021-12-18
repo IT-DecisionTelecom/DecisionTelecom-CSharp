@@ -81,7 +81,6 @@ namespace DecisionTelecom.Tests
         [InlineData("[\"error\",\"\"]")]
         [InlineData("[\"err\",44]")]
         [InlineData("[\"msg\",\"31885463\"]")]
-        [InlineData("[\"msgid\",\"\"]")]
         [InlineData("[\"msgid\"]")]
         [InlineData("[\"error\"]")]
         [InlineData("[]")]
