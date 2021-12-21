@@ -65,10 +65,10 @@ namespace DecisionTelecom
         /// <param name="messageId">Id of the Viber message (sent in the last 5 days)</param>
         /// <returns>Viber message status in case of success or error information otherwise</returns>
         /// <exception cref="InvalidOperationException">Not possible to parse response received from the server</exception>
-        public async Task<Result<ViberMessageResult, ViberError>> GetMessageStatusAsync(long messageId)
+        public async Task<Result<ViberMessageReceipt, ViberError>> GetMessageStatusAsync(long messageId)
         {
             var request = new Dictionary<string, long> { { MessageIdPropertyName, messageId } };
-            ViberMessageResult OkResponseFunc(string json) => JsonSerializer.Deserialize<ViberMessageResult>(json);
+            ViberMessageReceipt OkResponseFunc(string json) => JsonSerializer.Deserialize<ViberMessageReceipt>(json);
 
             return await ProcessRequestAsync($"{BaseUrl}/receive-viber", request, OkResponseFunc);
         }
