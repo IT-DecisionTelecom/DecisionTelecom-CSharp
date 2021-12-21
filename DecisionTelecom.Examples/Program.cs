@@ -8,16 +8,16 @@ namespace DecisionTelecom.Examples
         {
             // SMS client examples
             await SmsClientExample.SendMessageAsync();
-            await SmsClientExample.GetMessageStatusAsync(31885463);
+            await SmsClientExample.GetMessageStatusAsync();
             await SmsClientExample.GetBalanceAsync();
             
             // Viber client examples
             await ViberClientExample.SendMessageAsync();
-            await ViberClientExample.GetMessageStatusAsync(429);
+            await ViberClientExample.GetMessageStatusAsync();
             
             // ViberPlusSms client examples
             await ViberPlusSmsClientExample.SendMessageAsync();
-            await ViberPlusSmsClientExample.GetMessageStatusAsync(429);
+            await ViberPlusSmsClientExample.GetMessageStatusAsync();
         }
     }
 }

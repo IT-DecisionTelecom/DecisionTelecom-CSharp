@@ -14,9 +14,9 @@ namespace DecisionTelecom.Examples
             // Create message object
             var smsMessage = new SmsMessage
             {
-                Sender = "380503515090",
-                ReceiverPhone = "380503515090",
-                Text = "test",
+                Sender = "380504444444",
+                ReceiverPhone = "380505555555",
+                Text = "test message",
                 Delivery = true,
             };
 
@@ -35,18 +35,18 @@ namespace DecisionTelecom.Examples
                 // Otherwise, if operation was not successful (if error appeared during the operation execution),
                 // Error property contains the corresponding error code.
                 // It can be used to return desired result to the caller or show desired message.
-                Console.WriteLine($"Error occured while sending SMS message: {result.Error.ToString()}");
+                Console.WriteLine($"Error occurred while sending SMS message: {result.Error.ToString()}");
             }
         }
 
-        public static async Task GetMessageStatusAsync(long messageId)
+        public static async Task GetMessageStatusAsync()
         {
             // Create new instance of the SmsClient
             var smsClient = new SmsClient("<YOUR_LOGIN>", "<YOUR_PASSWORD>");
             
             // Call client method to get SMS message status.
             // Returned object has flag to specify whether the operation was successful or not.
-            var result = await smsClient.GetMessageDeliveryStatusAsync(messageId);
+            var result = await smsClient.GetMessageDeliveryStatusAsync(31885463);
             
             if (result.Success)
             {
@@ -59,7 +59,7 @@ namespace DecisionTelecom.Examples
                 // Otherwise, if operation was not successful (if error appeared during the operation execution),
                 // Error property contains the corresponding error code.
                 // It can be used to return desired result to the caller or show desired message.
-                Console.WriteLine($"Error occured while getting SMS message status: {result.Error.ToString()}");
+                Console.WriteLine($"Error occurred while getting SMS message status: {result.Error.ToString()}");
             }
         }
 
@@ -84,7 +84,7 @@ namespace DecisionTelecom.Examples
                 // Otherwise, if operation was not successful (if error appeared during the operation execution),
                 // Error property contains the corresponding error code.
                 // It can be used to return desired result to the caller or show desired message.
-                Console.WriteLine($"Error occured getting SMS balance: {result.Error.ToString()}");
+                Console.WriteLine($"Error occurred getting SMS balance: {result.Error.ToString()}");
             }
         }
     }

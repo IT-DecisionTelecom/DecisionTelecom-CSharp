@@ -15,7 +15,7 @@ namespace DecisionTelecom.Examples
             var viberMessage = new ViberMessage
             {
                 Sender = "Custom Company",
-                Receiver = "380503515090",
+                Receiver = "380504444444",
                 MessageType = ViberMessageType.TextOnly,
                 Text = "Test Viber Message",
                 ImageUrl = "https://yourdomain.com/images/image.jpg",
@@ -41,7 +41,7 @@ namespace DecisionTelecom.Examples
                 // Otherwise, if operation was not successful (if error appeared during the operation execution),
                 // Error property contains the corresponding error information.
                 // It can be used to return desired result to the caller or show desired message.
-                Console.WriteLine("Error occured while sending Viber message." +
+                Console.WriteLine("Error occurred while sending Viber message." +
                                   $"Error name: {result.Error.Name}/n" +
                                   $"Error message: {result.Error.Message}/n" +
                                   $"Error code: {result.Error.Code}/n" +
@@ -49,14 +49,14 @@ namespace DecisionTelecom.Examples
             }
         }
 
-        public static async Task GetMessageStatusAsync(long messageId)
+        public static async Task GetMessageStatusAsync()
         {
             // Create new instance of ViberClient
             var viberClient = new ViberClient("<YOUR_ACCESS_KEY>");
             
             // Call client method to get Viber message status.
             // Returned object has flag to specify whether the operation was successful or not.
-            var result = await viberClient.GetMessageStatusAsync(messageId);
+            var result = await viberClient.GetMessageStatusAsync(429);
             
             // If operation was successful, Value property contains operation result.
             // So it can be returned or displayed to the caller.
@@ -69,7 +69,7 @@ namespace DecisionTelecom.Examples
                 // Otherwise, if operation was not successful (if error appeared during the operation execution),
                 // Error property contains the corresponding error information.
                 // It can be used to return desired result to the caller or show desired message.
-                Console.WriteLine("Error occured getting Viber message status." +
+                Console.WriteLine("Error occurred while getting Viber message status." +
                                   $"Error name: {result.Error.Name}/n" +
                                   $"Error message: {result.Error.Message}/n" +
                                   $"Error code: {result.Error.Code}/n" +
