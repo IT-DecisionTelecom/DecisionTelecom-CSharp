@@ -23,7 +23,7 @@ Usage
 -----
 
 We have put some self-explanatory usage examples in the *DecisionTelecom.Examples* project,
-but here is a quick reference on how IT-Decision Telecom client works.
+but here is a quick reference on how IT-Decision Telecom clients work.
 First, you need to create a required client. Be sure to use real login, password and access key.
 
 ```csharp
@@ -40,6 +40,8 @@ Now you can use created clients to perform some operations. For example, this is
 // Get your SMS balance
 var balanceResult = await smsClient.GetBalanceAsync()
 ```
+
+Please see other examples in the *DecisionTelecom.Examples* project for a complete overview of all available SDK calls.
 
 ### Error handling
 All client methods return special `Result` object, which has flags to determine whether the operation was executed successfully or not.
@@ -64,30 +66,30 @@ SmsClient methods return errors in form of the error code. Here are all possible
 - 50 - Authentication error
 
 #### Viber errors
-ViberClient and ViberPlusSmsClient methods return errors in form of class with the `Name`, `Message`, `Code` and `Status` properties.
+ViberClient and ViberPlusSmsClient methods return errors in form of a class with the `Name`, `Message`, `Code` and `Status` properties.
 
 If underlying API request returns unsuccessful status code (like 401 Unauthorized),
 then client methods will return error with only `Name` and `Status` properties set:
 
-```csharp
+```json
 {
-  "name": "Unauthorized"
+  "name": "Unauthorized",
   "status": 401
 }
 ```
 
 Known Viber errors are:
 
-```csharp
+```json
 {
-  "name": "Too Many Requests"
+  "name": "Too Many Requests",
   "message": " Rate limit exceeded",
   "code": 0,
   "status": 429
 }
 ```
 
-```csharp
+```json
 {
   "name": "Invalid Parameter: [param_name]",
   "message": "Empty parameter or parameter validation error",
@@ -96,7 +98,7 @@ Known Viber errors are:
 }
 ```
 
-```csharp
+```json
 {
   "name": "Internal server error",
   "message": "The server encountered an unexpected condition which prevented it from fulfilling the request",
@@ -105,7 +107,7 @@ Known Viber errors are:
 }
 ```
 
-```csharp
+```json
 {
   "name": "Topup balance is required",
   "message": "User balance is empty",
