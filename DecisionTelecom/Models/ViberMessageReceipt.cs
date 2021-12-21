@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace DecisionTelecom.Models
 {
-    public class ViberMessageResult
+    public class ViberMessageReceipt
     {
         /// <summary>
         /// Id of the Viber message which status should be got (sent in the last 5 days)

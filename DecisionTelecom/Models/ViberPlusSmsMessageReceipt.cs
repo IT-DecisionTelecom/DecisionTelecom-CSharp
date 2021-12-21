@@ -5,13 +5,13 @@ namespace DecisionTelecom.Models
     /// <summary>
     /// Contains information about Viber and SMS messages status
     /// </summary>
-    public class ViberPlusSmsMessageResult : ViberMessageResult
+    public class ViberPlusSmsMessageReceipt : ViberMessageReceipt
     {
         /// <summary>
         /// SMS message Id (if available, only for transactional messages)
         /// </summary>
         [JsonPropertyName("sms_message_id")]
-        public int SmsMessageId { get; set; }
+        public long SmsMessageId { get; set; }
 
         /// <summary>
         /// SMS message status (if available, only for transactional messages) 
