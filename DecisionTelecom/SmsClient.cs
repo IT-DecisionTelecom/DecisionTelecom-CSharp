@@ -64,13 +64,8 @@ namespace DecisionTelecom
             var response = await httpClient.GetAsync(requestUri);
             return await GetResultFromHttpResponseMessage(response, OkResultFunc);
 
-            Result<long, SmsErrorCode> OkResultFunc(string responseContent)
-            {
-                var responseValue = GetValueFromListResponseContent(responseContent, MessageIdPropertyName);
-                return long.TryParse(responseValue, out var messageId)
-                    ? Result<long, SmsErrorCode>.Ok(messageId) 
-                    : Result<long, SmsErrorCode>.Fail<long>(SmsErrorCode.IncorrectJson);
-            }
+            long OkResultFunc(string responseContent) =>
+                long.Parse(GetValueFromListResponseContent(responseContent, MessageIdPropertyName));
         }
 
         /// <summary>
@@ -86,7 +81,7 @@ namespace DecisionTelecom
 
             return await GetResultFromHttpResponseMessage(response, OkResultFunc);
 
-            Result<SmsMessageStatus, SmsErrorCode> OkResultFunc(string responseContent)
+            SmsMessageStatus OkResultFunc(string responseContent)
             {
                 var responseValue = GetValueFromListResponseContent(responseContent, StatusPropertyName);
                 return string.IsNullOrEmpty(responseValue)
@@ -107,7 +102,7 @@ namespace DecisionTelecom
 
             return await GetResultFromHttpResponseMessage(response, OkResultFunc);
 
-            Result<Balance, SmsErrorCode> OkResultFunc(string responseContent)
+            Balance OkResultFunc(string responseContent)
             {
                 // Replace symbols to be able to parse response string as json
                 // Regexp removes quotation marks ("") around the numbers, so they could be parsed as float
@@ -129,7 +124,7 @@ namespace DecisionTelecom
         /// <exception cref="InvalidOperationException">Not possible to parse response from the server</exception>
         private static async Task<Result<T, SmsErrorCode>> GetResultFromHttpResponseMessage<T>(
             HttpResponseMessage responseMessage,
-            Func<string, Result<T, SmsErrorCode>> okResultFunc)
+            Func<string, T> okResultFunc)
         {
             var responseContent = await responseMessage.Content.ReadAsStringAsync();
             try
