@@ -5,7 +5,7 @@ namespace DecisionTelecom.Models
     /// <summary>
     /// Represents user money balance
     /// </summary>
-    public class Balance
+    public class SmsBalance
     {
         /// <summary>
         /// Current balance amount

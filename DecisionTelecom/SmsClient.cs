@@ -95,14 +95,14 @@ namespace DecisionTelecom
         /// </summary>
         /// <returns>User balance information</returns>
         /// <exception cref="InvalidOperationException">Not possible to parse response from the server</exception>
-        public async Task<Result<Balance, SmsErrorCode>> GetBalanceAsync()
+        public async Task<Result<SmsBalance, SmsErrorCode>> GetBalanceAsync()
         {
             var requestUri = $"{BaseUrl}/balance?login={Login}&password={Password}";
             var response = await httpClient.GetAsync(requestUri);
 
             return await GetResultFromHttpResponseMessage(response, OkResultFunc);
 
-            Balance OkResultFunc(string responseContent)
+            SmsBalance OkResultFunc(string responseContent)
             {
                 // Replace symbols to be able to parse response string as json
                 // Regexp removes quotation marks ("") around the numbers, so they could be parsed as float
@@ -110,7 +110,7 @@ namespace DecisionTelecom
                 var replacedContent = responseContent.Replace("[", "{").Replace("]", "}");
                 replacedContent = regex.Replace(replacedContent, "$1");
 
-                return JsonSerializer.Deserialize<Balance>(replacedContent);
+                return JsonSerializer.Deserialize<SmsBalance>(replacedContent);
             }
         }
 
