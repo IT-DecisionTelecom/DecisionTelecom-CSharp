@@ -2,6 +2,9 @@ using System.Text.Json.Serialization;
 
 namespace DecisionTelecom.Models
 {
+    /// <summary>
+    /// Represents Viber plus SMS message
+    /// </summary>
     public class ViberPlusSmsMessage : ViberMessage
     {
         /// <summary>

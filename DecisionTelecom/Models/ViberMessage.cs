@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace DecisionTelecom.Models
 {
     /// <summary>
-    /// 
+    /// Represents Viber message
     /// </summary>
     public class ViberMessage
     {

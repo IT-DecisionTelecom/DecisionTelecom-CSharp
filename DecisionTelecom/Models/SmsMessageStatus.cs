@@ -1,5 +1,8 @@
 namespace DecisionTelecom.Models
 {
+    /// <summary>
+    /// Represents SMS message status
+    /// </summary>
     public enum SmsMessageStatus
     {
         Unknown = 0,

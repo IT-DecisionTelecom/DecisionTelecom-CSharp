@@ -1,5 +1,8 @@
 namespace DecisionTelecom.Models
 {
+    /// <summary>
+    /// Represents SMS message
+    /// </summary>
     public class SmsMessage
     {
         /// <summary>

@@ -1,5 +1,8 @@
 namespace DecisionTelecom.Models
 {
+    /// <summary>
+    /// Represents Viber message status
+    /// </summary>
     public enum ViberMessageStatus
     {
         Sent = 0,

@@ -1,5 +1,8 @@
 namespace DecisionTelecom.Models
 {
+    /// <summary>
+    /// Represents Viber message type
+    /// </summary>
     public enum ViberMessageType
     {
         /// <summary>

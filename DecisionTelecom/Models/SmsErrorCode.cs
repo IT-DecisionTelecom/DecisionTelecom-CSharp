@@ -1,5 +1,8 @@
 namespace DecisionTelecom.Models
 {
+    /// <summary>
+    /// Represents SMS error code
+    /// </summary>
     public enum SmsErrorCode
     {
         InvalidNumber = 40,
