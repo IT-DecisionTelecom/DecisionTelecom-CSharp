@@ -11,7 +11,7 @@ namespace DecisionTelecom.Examples
             // Create new instance of ViberClient
             var viberClient = new ViberClient("<YOUR_ACCESS_KEY>");
             
-            // Create message object.  This one will be transactional message with message text only.
+            // Create message object. This one will be transactional message with message text only.
             var viberMessage = new ViberMessage
             {
                 Sender = "Custom Company",
