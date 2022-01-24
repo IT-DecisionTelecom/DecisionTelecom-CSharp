@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using DecisionTelecom.Exceptions;
 using DecisionTelecom.Models;
 using DecisionTelecom.Tests.Extensions;
 using Moq;
@@ -28,12 +28,13 @@ namespace DecisionTelecom.Tests
         [Fact]
         public async Task TestSendMessageReturnsMessageIdAsync()
         {
-            const int messageId = 429;
+            const int expectedMessageId = 429;
 
             var sendMessageResponse = new Dictionary<string, int>
             {
-                { "message_id", messageId },
+                { "message_id", expectedMessageId },
             };
+
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
@@ -42,14 +43,13 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await viberPlusSmsClient.SendMessageAsync(new ViberMessage());
+            var messageId = await viberPlusSmsClient.SendMessageAsync(new ViberPlusSmsMessage());
             
-            Assert.True(result.Success);
-            Assert.Equal(messageId, result.Value);
+            Assert.Equal(expectedMessageId, messageId);
         }
         
         [Fact]
-        public async Task TestSendMessageReturnsErrorSuccessStatusCodeAsync()
+        public async Task TestSendMessageReturnsViberErrorAsync()
         {
             var error = new ViberError
             {
@@ -66,24 +66,22 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await viberPlusSmsClient.SendMessageAsync(new ViberMessage());
-            
-            Assert.True(result.Failure);
-            Assert.NotNull(result.Error);
-            Assert.Equal(error.Name, result.Error.Name);
-            Assert.Equal(error.Message, result.Error.Message);
-            Assert.Equal(error.Code, result.Error.Code);
-            Assert.Equal(error.Status, result.Error.Status);
+            var viberException = await Assert.ThrowsAsync<ViberException>(() =>
+                viberPlusSmsClient.SendMessageAsync(new ViberPlusSmsMessage()));
+
+            Assert.NotNull(viberException);
+            Assert.NotNull(viberException.Error);
+            Assert.Equal(error.Name, viberException.Error.Name);
+            Assert.Equal(error.Message, viberException.Error.Message);
+            Assert.Equal(error.Code, viberException.Error.Code);
+            Assert.Equal(error.Status, viberException.Error.Status);
         }
         
         [Fact]
         public async Task TestSendMessageReturnsNotSuccessStatusCodeAsync()
         {
-            var error = new ViberError
-            {
-                Name = "Unauthorized",
-                Status = 401,
-            };
+            var expectedMessage = "An error occurred while processing request. Response code: 401 (Unauthorized)";
+
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.Unauthorized,
@@ -92,12 +90,12 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await viberPlusSmsClient.SendMessageAsync(new ViberMessage());
+            var exception = await Assert.ThrowsAsync<ViberException>(() =>
+                viberPlusSmsClient.SendMessageAsync(new ViberPlusSmsMessage()));
             
-            Assert.True(result.Failure);
-            Assert.NotNull(result.Error);
-            Assert.Equal(error.Name, result.Error.Name);
-            Assert.Equal(error.Status, result.Error.Status);
+            Assert.NotNull(exception);
+            Assert.Null(exception.Error);
+            Assert.Equal(expectedMessage, exception.Message);
         }
         
         [Fact]
@@ -111,20 +109,28 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                viberPlusSmsClient.SendMessageAsync(new ViberMessage()));
+            var exception = await Assert.ThrowsAsync<ViberException>(() =>
+                viberPlusSmsClient.SendMessageAsync(new ViberPlusSmsMessage()));
+
+            Assert.NotNull(exception);
+            Assert.Null(exception.Error);
+            Assert.NotNull(exception.Message);
         }
         
         [Fact]
         public async Task TestGetMessageStatusAsyncReturnsMessageIdAsync()
         {
             const int messageId = 429;
+            const int smsMessageId = 3098;
             const ViberMessageStatus messageStatus = ViberMessageStatus.Delivered;
+            const SmsMessageStatus smsMessageStatus = SmsMessageStatus.Accepted;
 
             var sendMessageResponse = new Dictionary<string, int>
             {
                 { "message_id", messageId },
                 { "status", (int)messageStatus },
+                { "sms_message_id", smsMessageId },
+                { "sms_message_status", (int)smsMessageStatus }
             };
             
             var response = new HttpResponseMessage
@@ -135,15 +141,17 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await viberPlusSmsClient.GetMessageStatusAsync(messageId);
+            var receipt = await viberPlusSmsClient.GetMessageStatusAsync(messageId);
             
-            Assert.True(result.Success);
-            Assert.Equal(messageId, result.Value.ViberMessageId);
-            Assert.Equal(messageStatus, result.Value.ViberMessageStatus);
+            Assert.NotNull(receipt);
+            Assert.Equal(messageId, receipt.ViberMessageId);
+            Assert.Equal(messageStatus, receipt.ViberMessageStatus);
+            Assert.Equal(smsMessageId, receipt.SmsMessageId);
+            Assert.Equal(smsMessageStatus, receipt.SmsMessageStatus);
         }
         
         [Fact]
-        public async Task TestGetMessageStatusReturnsErrorAsync()
+        public async Task TestGetMessageStatusReturnsViberErrorAsync()
         {
             var error = new ViberError
             {
@@ -160,24 +168,20 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await viberPlusSmsClient.GetMessageStatusAsync(429);
-            
-            Assert.True(result.Failure);
-            Assert.NotNull(result.Error);
-            Assert.Equal(error.Name, result.Error.Name);
-            Assert.Equal(error.Message, result.Error.Message);
-            Assert.Equal(error.Code, result.Error.Code);
-            Assert.Equal(error.Status, result.Error.Status);
+            var viberException = await Assert.ThrowsAsync<ViberException>(() => viberPlusSmsClient.GetMessageStatusAsync(429));
+
+            Assert.NotNull(viberException);
+            Assert.NotNull(viberException.Error);
+            Assert.Equal(error.Name, viberException.Error.Name);
+            Assert.Equal(error.Message, viberException.Error.Message);
+            Assert.Equal(error.Code, viberException.Error.Code);
+            Assert.Equal(error.Status, viberException.Error.Status);
         }
         
         [Fact]
         public async Task TestGetMessageStatusReturnsNotSuccessStatusCodeAsync()
         {
-            var error = new ViberError
-            {
-                Name = "Unauthorized",
-                Status = 401,
-            };
+            var expectedMessage = "An error occurred while processing request. Response code: 401 (Unauthorized)";
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.Unauthorized,
@@ -186,12 +190,11 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await viberPlusSmsClient.GetMessageStatusAsync(429);
-            
-            Assert.True(result.Failure);
-            Assert.NotNull(result.Error);
-            Assert.Equal(error.Name, result.Error.Name);
-            Assert.Equal(error.Status, result.Error.Status);
+            var exception = await Assert.ThrowsAsync<ViberException>(() => viberPlusSmsClient.GetMessageStatusAsync(429));
+
+            Assert.NotNull(exception);
+            Assert.Null(exception.Error);
+            Assert.Equal(expectedMessage, exception.Message);
         }
         
         [Fact]
@@ -205,7 +208,11 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => viberPlusSmsClient.GetMessageStatusAsync(429));
+            var exception = await Assert.ThrowsAsync<ViberException>(() => viberPlusSmsClient.GetMessageStatusAsync(429));
+
+            Assert.NotNull(exception);
+            Assert.Null(exception.Error);
+            Assert.NotNull(exception.Message);
         }
     }
 }

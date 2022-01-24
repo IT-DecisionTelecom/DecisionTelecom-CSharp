@@ -5,8 +5,8 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using DecisionTelecom.Exceptions;
 using DecisionTelecom.Models;
-using DecisionTelecom.Models.Common;
 
 namespace DecisionTelecom
 {
@@ -51,7 +51,7 @@ namespace DecisionTelecom
         /// <param name="message">Viber message to send</param>
         /// <returns>Id of the sent Viber message in case of success or error information otherwise</returns>
         /// <exception cref="InvalidOperationException">Not possible to parse response received from the server</exception>
-        public async Task<Result<long, ViberError>> SendMessageAsync(ViberMessage message)
+        public async Task<long> SendMessageAsync(ViberMessage message)
         {
             long OkResponseFunc(string json) =>
                 JsonDocument.Parse(json).RootElement.GetProperty(MessageIdPropertyName).GetInt64();
@@ -65,7 +65,7 @@ namespace DecisionTelecom
         /// <param name="messageId">Id of the Viber message (sent in the last 5 days)</param>
         /// <returns>Viber message status in case of success or error information otherwise</returns>
         /// <exception cref="InvalidOperationException">Not possible to parse response received from the server</exception>
-        public async Task<Result<ViberMessageReceipt, ViberError>> GetMessageStatusAsync(long messageId)
+        public async Task<ViberMessageReceipt> GetMessageStatusAsync(long messageId)
         {
             var request = new Dictionary<string, long> { { MessageIdPropertyName, messageId } };
             ViberMessageReceipt OkResponseFunc(string json) => JsonSerializer.Deserialize<ViberMessageReceipt>(json);
@@ -73,30 +73,31 @@ namespace DecisionTelecom
             return await ProcessRequestAsync($"{BaseUrl}/receive-viber", request, OkResponseFunc);
         }
 
-        protected async Task<Result<T, ViberError>> ProcessRequestAsync<T>(string url, object request, Func<string, T> okResponseFunc)
+        protected async Task<T> ProcessRequestAsync<T>(string url, object request, Func<string, T> okResponseFunc)
         {
             var response = await MakeRequestAsync(url, request);
             var json = await response.Content.ReadAsStringAsync();
 
+            // Process unsuccessful status codes
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new ViberException(
+                    $"An error occurred while processing request. Response code: {(int)response.StatusCode} ({response.StatusCode.ToString()})");
+            }
+
+            // If response contains "name", "message", "code" and "status" words, treat it as an ViberError   
+            if (json.Contains("name") && json.Contains("message") && json.Contains("code") && json.Contains("status"))
+            {
+                throw ViberException.FromResponse(json);
+            }
+
             try
             {
-                // Process unsuccessful status codes
-                if (!response.IsSuccessStatusCode)
-                {
-                    return new ViberError { Status = (int)response.StatusCode, Name = response.StatusCode.ToString() };
-                }
-
-                // If response contains "name", "message", "code" and "status" words, treat it as an ViberError   
-                if (json.Contains("name") && json.Contains("message") && json.Contains("code") && json.Contains("status"))
-                {
-                    return JsonSerializer.Deserialize<ViberError>(json);
-                }
-
                 return okResponseFunc(json);
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException(
+                throw new ViberException(
                     $"Unable to process service response. Please contact support. Response content: {json}", ex);
             }
         }
