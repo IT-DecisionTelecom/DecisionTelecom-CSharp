@@ -18,7 +18,6 @@ namespace DecisionTelecom.Examples
             
             // ViberPlusSms client examples
             await ViberPlusSmsClientExample.SendTransactionalMessageAsync();
-            await ViberPlusSmsClientExample.SendPromotionalMessageAsync();
             await ViberPlusSmsClientExample.GetMessageStatusAsync();
         }
     }
