@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using DecisionTelecom.Exceptions;
 using DecisionTelecom.Models;
-using DecisionTelecom.Models.Common;
 
 namespace DecisionTelecom
 {
@@ -36,7 +36,7 @@ namespace DecisionTelecom
         /// </summary>
         /// <param name="message">Viber plus SMS message to send</param>
         /// <returns>Id of the sent Viber message in case of success or error information otherwise</returns>
-        /// <exception cref="InvalidOperationException">Not possible to parse response received from the server</exception>
+        /// <exception cref="ViberException">Specific Viber error occurred</exception>
         public async Task<long> SendMessageAsync(ViberPlusSmsMessage message)
         {
             return await base.SendMessageAsync(message);
@@ -47,7 +47,7 @@ namespace DecisionTelecom
         /// </summary>
         /// <param name="messageId">Id of the Viber message (sent in the last 5 days)</param>
         /// <returns>Viber message status in case of success or error information otherwise</returns>
-        /// <exception cref="InvalidOperationException">Not possible to parse response received from the server</exception>
+        /// <exception cref="ViberException">Specific Viber error occurred</exception>
         public new async Task<ViberPlusSmsMessageReceipt> GetMessageStatusAsync(long messageId)
         {
             var request = new Dictionary<string, long> { { MessageIdPropertyName, messageId } };

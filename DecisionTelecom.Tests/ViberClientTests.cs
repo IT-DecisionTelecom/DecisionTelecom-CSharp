@@ -83,7 +83,7 @@ namespace DecisionTelecom.Tests
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.Unauthorized,
-                Content = new StringContent(JsonSerializer.Serialize("Some response message text")),
+                Content = new StringContent("Some response message text"),
             };
             
             handlerMock.SetupHttpHandlerResponse(response);
@@ -176,7 +176,7 @@ namespace DecisionTelecom.Tests
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.Unauthorized,
-                Content = new StringContent(JsonSerializer.Serialize("Some error message text")),
+                Content = new StringContent("Some error message text"),
             };
             
             handlerMock.SetupHttpHandlerResponse(response);

@@ -45,7 +45,8 @@ namespace DecisionTelecom.Examples
                 }
                 else
                 {
-                    // Otherwise non-DecisionTelecom error occurred during the operation (like connection error)
+                    // Otherwise non-DecisionTelecom error occurred during the operation,
+                    // like unsuccessful response status code was returned by API
                     Console.WriteLine($"Error occurred while sending Viber message: {ex.Message}");
                 }
             }
@@ -92,7 +93,8 @@ namespace DecisionTelecom.Examples
                 }
                 else
                 {
-                    // Otherwise non-DecisionTelecom error occurred during the operation (like connection error)
+                    // Otherwise non-DecisionTelecom error occurred during the operation,
+                    // like unsuccessful response status code was returned by API
                     Console.WriteLine($"Error occurred while sending Viber message: {ex.Message}");
                 }
             }
@@ -124,7 +126,8 @@ namespace DecisionTelecom.Examples
                 }
                 else
                 {
-                    // Otherwise non-DecisionTelecom error occurred during the operation (like connection error)
+                    // Otherwise non-DecisionTelecom error occurred during the operation,
+                    // like unsuccessful response status code was returned by API
                     Console.WriteLine($"Error occurred while getting Viber message status: {ex.Message}");
                 }
             }

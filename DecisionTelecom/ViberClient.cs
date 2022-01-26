@@ -50,7 +50,7 @@ namespace DecisionTelecom
         /// </summary>
         /// <param name="message">Viber message to send</param>
         /// <returns>Id of the sent Viber message in case of success or error information otherwise</returns>
-        /// <exception cref="InvalidOperationException">Not possible to parse response received from the server</exception>
+        /// <exception cref="ViberException">Specific Viber error occurred</exception>
         public async Task<long> SendMessageAsync(ViberMessage message)
         {
             long OkResponseFunc(string json) =>
@@ -64,7 +64,7 @@ namespace DecisionTelecom
         /// </summary>
         /// <param name="messageId">Id of the Viber message (sent in the last 5 days)</param>
         /// <returns>Viber message status in case of success or error information otherwise</returns>
-        /// <exception cref="InvalidOperationException">Not possible to parse response received from the server</exception>
+        /// <exception cref="ViberException">Specific Viber error occurred</exception>
         public async Task<ViberMessageReceipt> GetMessageStatusAsync(long messageId)
         {
             var request = new Dictionary<string, long> { { MessageIdPropertyName, messageId } };
