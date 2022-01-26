@@ -1,7 +1,7 @@
-using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using DecisionTelecom.Exceptions;
 using DecisionTelecom.Models;
 using DecisionTelecom.Tests.Extensions;
 using Moq;
@@ -35,14 +35,13 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await smsClient.SendMessageAsync(new SmsMessage());
-            
-            Assert.True(result.Success);
-            Assert.Equal(expectedMessageId, result.Value);
+            var messageId = await smsClient.SendMessageAsync(new SmsMessage());
+
+            Assert.Equal(expectedMessageId, messageId);
         }
 
         [Fact]
-        public async Task TestSendMessageReturnsErrorAsync()
+        public async Task TestSendMessageReturnsErrorCodeAsync()
         {
             const SmsErrorCode expectedErrorCode = SmsErrorCode.InvalidLoginOrPassword;
             var response = new HttpResponseMessage
@@ -53,10 +52,28 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await smsClient.SendMessageAsync(new SmsMessage());
+            var smsException = await Assert.ThrowsAsync<SmsException>(() => smsClient.SendMessageAsync(new SmsMessage()));
             
-            Assert.True(result.Failure);
-            Assert.Equal(expectedErrorCode, result.Error);
+            Assert.NotNull(smsException);
+            Assert.Equal(expectedErrorCode, smsException.ErrorCode);
+        }
+        
+        [Fact]
+        public async Task TestSendMessageReturnsUnsuccessfulResponseCodeAsync()
+        {
+            var expectedMessage = "An error occurred while processing request. Response code: 401 (Unauthorized)";
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.Unauthorized,
+                Content = new StringContent("Some general error message"),
+            };
+            
+            handlerMock.SetupHttpHandlerResponse(response);
+
+            var smsException = await Assert.ThrowsAsync<SmsException>(() => smsClient.SendMessageAsync(new SmsMessage()));
+            
+            Assert.NotNull(smsException);
+            Assert.Equal(expectedMessage, smsException.Message);
         }
         
         [Theory]
@@ -78,12 +95,14 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await smsClient.SendMessageAsync(new SmsMessage()));
+            var smsException = await Assert.ThrowsAsync<SmsException>(() => smsClient.SendMessageAsync(new SmsMessage()));
+            
+            Assert.NotNull(smsException);
+            Assert.NotNull(smsException.Message);
         }
         
         [Fact]
-        public async Task TestGetMessageDeliveryStatusReturnsStatusCodeAsync()
+        public async Task TestGetMessageStatusReturnsStatusCodeAsync()
         {
             const SmsMessageStatus expectedDeliveryStatus = SmsMessageStatus.Delivered;
             var response = new HttpResponseMessage
@@ -94,10 +113,9 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await smsClient.GetMessageDeliveryStatusAsync(1234);
-            
-            Assert.True(result.Success);
-            Assert.Equal(expectedDeliveryStatus, result.Value);
+            var status = await smsClient.GetMessageStatusAsync(1234);
+
+            Assert.Equal(expectedDeliveryStatus, status);
         }
         
         [Fact]
@@ -112,14 +130,13 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await smsClient.GetMessageDeliveryStatusAsync(1234);
-            
-            Assert.True(result.Success);
-            Assert.Equal(expectedDeliveryStatus, result.Value);
+            var status = await smsClient.GetMessageStatusAsync(1234);
+
+            Assert.Equal(expectedDeliveryStatus, status);
         }
 
         [Fact]
-        public async Task TestGetMessageDeliveryStatusReturnsErrorAsync()
+        public async Task TestGetMessageDeliveryStatusReturnsErrorCodeAsync()
         {
             const SmsErrorCode expectedErrorCode = SmsErrorCode.InvalidLoginOrPassword;
             var response = new HttpResponseMessage
@@ -130,10 +147,28 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await smsClient.GetMessageDeliveryStatusAsync(1234);
+            var smsException = await Assert.ThrowsAsync<SmsException>(() => smsClient.GetMessageStatusAsync(1234));
             
-            Assert.True(result.Failure);
-            Assert.Equal(expectedErrorCode, result.Error);
+            Assert.NotNull(smsException);
+            Assert.Equal(expectedErrorCode, smsException.ErrorCode);
+        }
+        
+        [Fact]
+        public async Task TestGetMessageStatusReturnsUnsuccessfulResponseCodeAsync()
+        {
+            var expectedMessage = "An error occurred while processing request. Response code: 401 (Unauthorized)";
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.Unauthorized,
+                Content = new StringContent("Some general error message"),
+            };
+            
+            handlerMock.SetupHttpHandlerResponse(response);
+
+            var smsException = await Assert.ThrowsAsync<SmsException>(() => smsClient.GetMessageStatusAsync(1234));
+            
+            Assert.NotNull(smsException);
+            Assert.Equal(expectedMessage, smsException.Message);
         }
         
         [Theory]
@@ -154,8 +189,10 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await smsClient.GetMessageDeliveryStatusAsync(1234));
+            var smsException = await Assert.ThrowsAsync<SmsException>(() => smsClient.GetMessageStatusAsync(1234));
+            
+            Assert.NotNull(smsException);
+            Assert.NotNull(smsException.Message);
         }
         
         [Fact]
@@ -174,16 +211,16 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await smsClient.GetBalanceAsync();
+            var balance = await smsClient.GetBalanceAsync();
             
-            Assert.True(result.Success);
-            Assert.Equal(expectedBalance, result.Value.BalanceAmount);
-            Assert.Equal(expectedCredit, result.Value.CreditAmount);
-            Assert.Equal(expectedCurrency, result.Value.Currency);
+            Assert.NotNull(balance);
+            Assert.Equal(expectedBalance, balance.BalanceAmount);
+            Assert.Equal(expectedCredit, balance.CreditAmount);
+            Assert.Equal(expectedCurrency, balance.Currency);
         }
 
         [Fact]
-        public async Task TestGetBalanceReturnsErrorAsync()
+        public async Task TestGetBalanceReturnsErrorCodeAsync()
         {
             const SmsErrorCode expectedErrorCode = SmsErrorCode.InvalidLoginOrPassword;
             var response = new HttpResponseMessage
@@ -194,10 +231,28 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await smsClient.GetBalanceAsync();
+            var smsException = await Assert.ThrowsAsync<SmsException>(() => smsClient.GetBalanceAsync());
             
-            Assert.True(result.Failure);
-            Assert.Equal(expectedErrorCode, result.Error);
+            Assert.NotNull(smsException);
+            Assert.Equal(expectedErrorCode, smsException.ErrorCode);
+        }
+        
+        [Fact]
+        public async Task TestGetBalanceReturnsUnsuccessfulResponseCodeAsync()
+        {
+            var expectedMessage = "An error occurred while processing request. Response code: 401 (Unauthorized)";
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.Unauthorized,
+                Content = new StringContent("Some response message text"),
+            };
+            
+            handlerMock.SetupHttpHandlerResponse(response);
+
+            var smsException = await Assert.ThrowsAsync<SmsException>(() => smsClient.GetBalanceAsync());
+            
+            Assert.NotNull(smsException);
+            Assert.Equal(expectedMessage, smsException.Message);
         }
         
         [Theory]
@@ -216,7 +271,10 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await smsClient.GetBalanceAsync());
+            var smsException = await Assert.ThrowsAsync<SmsException>(() => smsClient.GetBalanceAsync());
+            
+            Assert.NotNull(smsException);
+            Assert.NotNull(smsException.Message);
         }
 
         [Theory]
@@ -232,11 +290,12 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await smsClient.GetBalanceAsync();
-            Assert.True(result.Success);
-            Assert.NotEqual(0, result.Value.BalanceAmount);
-            Assert.Equal(0, result.Value.CreditAmount);
-            Assert.Null(result.Value.Currency);            
+            var balance = await smsClient.GetBalanceAsync();
+            
+            Assert.NotNull(balance);
+            Assert.NotEqual(0, balance.BalanceAmount);
+            Assert.Equal(0, balance.CreditAmount);
+            Assert.Null(balance.Currency);            
         }
 
         [Theory]
@@ -252,11 +311,12 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await smsClient.GetBalanceAsync();
-            Assert.True(result.Success);
-            Assert.Equal(0, result.Value.BalanceAmount);
-            Assert.NotEqual(0, result.Value.CreditAmount);
-            Assert.Null(result.Value.Currency);            
+            var balance = await smsClient.GetBalanceAsync();
+
+            Assert.NotNull(balance);
+            Assert.Equal(0, balance.BalanceAmount);
+            Assert.NotEqual(0, balance.CreditAmount);
+            Assert.Null(balance.Currency);            
         }
 
         [Theory]
@@ -271,11 +331,12 @@ namespace DecisionTelecom.Tests
             
             handlerMock.SetupHttpHandlerResponse(response);
 
-            var result = await smsClient.GetBalanceAsync();
-            Assert.True(result.Success);
-            Assert.Equal(0, result.Value.BalanceAmount);
-            Assert.Equal(0, result.Value.CreditAmount);
-            Assert.Null(result.Value.Currency);            
+            var balance = await smsClient.GetBalanceAsync();
+
+            Assert.NotNull(balance);
+            Assert.Equal(0, balance.BalanceAmount);
+            Assert.Equal(0, balance.CreditAmount);
+            Assert.Null(balance.Currency);            
         }
     }
 }

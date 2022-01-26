@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using DecisionTelecom.Exceptions;
 using DecisionTelecom.Models;
 
 namespace DecisionTelecom.Examples
@@ -8,83 +9,101 @@ namespace DecisionTelecom.Examples
     {
         public static async Task SendMessageAsync()
         {
-            // Create new instance of the SmsClient
-            var smsClient = new SmsClient("<YOUR_LOGIN>", "<YOUR_PASSWORD>");
-            
-            // Create message object
-            var smsMessage = new SmsMessage
+            try
             {
-                Sender = "380504444444",
-                ReceiverPhone = "380505555555",
-                Text = "test message",
-                Delivery = true,
-            };
+                // Create new instance of the SmsClient
+                var smsClient = new SmsClient("<YOUR_LOGIN>", "<YOUR_PASSWORD>");
 
-            // Call client SendMessage method to send SMS message.
-            // Returned object has flag to specify whether the operation was successful or not.
-            var result = await smsClient.SendMessageAsync(smsMessage);
-            
-            if (result.Success)
-            {
-                // If operation was successful, Value property contains operation result.
-                // So it can be returned or displayed to the caller.
-                Console.WriteLine($"Message was successfully sent. MessageId: {result.Value}");
+                // Create message object
+                var smsMessage = new SmsMessage
+                {
+                    Sender = "380504444444",
+                    ReceiverPhone = "380505555555",
+                    Text = "test message",
+                    Delivery = true,
+                };
+
+                // Call client SendMessage method to send SMS message
+                var messageId = await smsClient.SendMessageAsync(smsMessage);
+
+                // SendMessage method should return Id of the sent Viber message
+                Console.WriteLine($"Message was successfully sent. MessageId: {messageId}");
             }
-            else
+            catch (SmsException ex)
             {
-                // Otherwise, if operation was not successful (if error appeared during the operation execution),
-                // Error property contains the corresponding error code.
+                // SmsException may contain specific DecisionTelecom error code of what went wrong during the operation
                 // It can be used to return desired result to the caller or show desired message.
-                Console.WriteLine($"Error occurred while sending SMS message: {result.Error.ToString()}");
+                if (ex.HasErrorCode)
+                {
+                    Console.WriteLine($"Error occurred while sending SMS message: {ex.ErrorCode.ToString()}");
+                }
+                else
+                {
+                    // Otherwise non-DecisionTelecom error occurred during the operation,
+                    // like unsuccessful response status code was returned by API
+                    Console.WriteLine($"Error occurred while sending SMS message: {ex.Message}");
+                }
             }
         }
 
         public static async Task GetMessageStatusAsync()
         {
-            // Create new instance of the SmsClient
-            var smsClient = new SmsClient("<YOUR_LOGIN>", "<YOUR_PASSWORD>");
-            
-            // Call client method to get SMS message status.
-            // Returned object has flag to specify whether the operation was successful or not.
-            var result = await smsClient.GetMessageDeliveryStatusAsync(31885463);
-            
-            if (result.Success)
+            try
             {
-                // If operation was successful, Value property contains operation result.
-                // So it can be returned or displayed to the caller.
-                Console.WriteLine($"Message status {result.Value.ToString()}");
+                // Create new instance of the SmsClient
+                var smsClient = new SmsClient("<YOUR_LOGIN>", "<YOUR_PASSWORD>");
+
+                // Call client method to get SMS message status
+                var status = await smsClient.GetMessageStatusAsync(31885463);
+
+                // GetMessageStatus method should return status of the sent SMS message.
+                Console.WriteLine($"Message status: {status.ToString()}");
             }
-            else
+            catch (SmsException ex)
             {
-                // Otherwise, if operation was not successful (if error appeared during the operation execution),
-                // Error property contains the corresponding error code.
+                // SmsException may contain specific DecisionTelecom error code of what went wrong during the operation
                 // It can be used to return desired result to the caller or show desired message.
-                Console.WriteLine($"Error occurred while getting SMS message status: {result.Error.ToString()}");
+                if (ex.HasErrorCode)
+                {
+                    Console.WriteLine($"Error occurred while getting SMS message status: {ex.ErrorCode.ToString()}");
+                }
+                else
+                {
+                    // Otherwise non-DecisionTelecom error occurred during the operation,
+                    // like unsuccessful response status code was returned by API
+                    Console.WriteLine($"Error occurred while getting SMS message status: {ex.Message}");
+                }
             }
         }
 
         public static async Task GetBalanceAsync()
         {
-            // Create new instance of the SmsClient
-            var smsClient = new SmsClient("<YOUR_LOGIN>", "<YOUR_PASSWORD>");
-
-            // Call client method to get the user balance.
-            // Returned object has flag to specify whether the operation was successful or not.
-            var result = await smsClient.GetBalanceAsync();
-
-            if (result.Success)
+            try
             {
-                // If operation was successful, Value property contains operation result.
-                // So it can be returned or displayed to the caller.
+                // Create new instance of the SmsClient
+                var smsClient = new SmsClient("<YOUR_LOGIN>", "<YOUR_PASSWORD>");
+
+                // Call client method to get the user balance
+                var balance = await smsClient.GetBalanceAsync();
+
+                // GetBalance method should return SMS balance information
                 Console.WriteLine(
-                    $"Your balance information. Balance: {result.Value.BalanceAmount}, Credit: {result.Value.CreditAmount}, Currency: {result.Value.Currency}");
+                    $"Balance information. Balance: {balance.BalanceAmount}, Credit: {balance.CreditAmount}, Currency: {balance.Currency}");
             }
-            else
+            catch (SmsException ex)
             {
-                // Otherwise, if operation was not successful (if error appeared during the operation execution),
-                // Error property contains the corresponding error code.
+                // SmsException may contain specific DecisionTelecom error code of what went wrong during the operation
                 // It can be used to return desired result to the caller or show desired message.
-                Console.WriteLine($"Error occurred getting SMS balance: {result.Error.ToString()}");
+                if (ex.HasErrorCode)
+                {
+                    Console.WriteLine($"Error occurred getting SMS balance: {ex.ErrorCode.ToString()}");
+                }
+                else
+                {
+                    // Otherwise non-DecisionTelecom error occurred during the operation,
+                    // like unsuccessful response status code was returned by API
+                    Console.WriteLine($"Error occurred getting SMS balance: {ex.Message}");
+                }
             }
         }
     }

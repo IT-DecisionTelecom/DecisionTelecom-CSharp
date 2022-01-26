@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using DecisionTelecom.Exceptions;
 using DecisionTelecom.Models;
 using DecisionTelecom.Models.Common;
 
@@ -55,14 +56,13 @@ namespace DecisionTelecom
         /// </summary>
         /// <param name="message">SMS message to send</param>
         /// <returns>The Id of the submitted SMS message in case of success or error code otherwise</returns>
-        /// <exception cref="InvalidOperationException">Not possible to parse response from the server</exception>
-        public async Task<Result<long, SmsErrorCode>> SendMessageAsync(SmsMessage message)
+        /// <exception cref="SmsException">Specific Sms error occurred</exception>
+        public async Task<long> SendMessageAsync(SmsMessage message)
         {
             var requestUri =
                 $"{BaseUrl}/send?login={Login}&password={Password}&phone={message.ReceiverPhone}&sender={message.Sender}&text={message.Text}&dlr={Convert.ToInt16(message.Delivery)}";
 
-            var response = await httpClient.GetAsync(requestUri);
-            return await GetResultFromHttpResponseMessage(response, OkResultFunc);
+            return await MakeHttpRequestAsync(requestUri, OkResultFunc);
 
             long OkResultFunc(string responseContent) =>
                 long.Parse(GetValueFromListResponseContent(responseContent, MessageIdPropertyName));
@@ -73,13 +73,11 @@ namespace DecisionTelecom
         /// </summary>
         /// <param name="messageId">The Id of the submitted SMS</param>
         /// <returns>SMS message delivery status in case of success or error code otherwise</returns>
-        /// <exception cref="InvalidOperationException">Not possible to parse response from the server</exception>
-        public async Task<Result<SmsMessageStatus, SmsErrorCode>> GetMessageDeliveryStatusAsync(long messageId)
+        /// <exception cref="SmsException">Specific Sms error occurred</exception>
+        public async Task<SmsMessageStatus> GetMessageStatusAsync(long messageId)
         {
             var requestUri = $"{BaseUrl}/state?login={Login}&password={Password}&msgid={messageId}";
-            var response = await httpClient.GetAsync(requestUri);
-
-            return await GetResultFromHttpResponseMessage(response, OkResultFunc);
+            return await MakeHttpRequestAsync(requestUri, OkResultFunc);
 
             SmsMessageStatus OkResultFunc(string responseContent)
             {
@@ -94,13 +92,11 @@ namespace DecisionTelecom
         /// Returns balance information
         /// </summary>
         /// <returns>User balance information</returns>
-        /// <exception cref="InvalidOperationException">Not possible to parse response from the server</exception>
-        public async Task<Result<SmsBalance, SmsErrorCode>> GetBalanceAsync()
+        /// <exception cref="SmsException">Specific Sms error occurred</exception>
+        public async Task<SmsBalance> GetBalanceAsync()
         {
             var requestUri = $"{BaseUrl}/balance?login={Login}&password={Password}";
-            var response = await httpClient.GetAsync(requestUri);
-
-            return await GetResultFromHttpResponseMessage(response, OkResultFunc);
+            return await MakeHttpRequestAsync(requestUri, OkResultFunc);
 
             SmsBalance OkResultFunc(string responseContent)
             {
@@ -115,31 +111,64 @@ namespace DecisionTelecom
         }
 
         /// <summary>
-        /// Processes HttpResponseMessage and returns Result object 
+        /// Makes HTTP request and processes response 
         /// </summary>
-        /// <param name="responseMessage">Http response message</param>
-        /// <param name="okResultFunc">Function to create Result object in case when http request was successful</param>
+        /// <param name="requestUri">Request URL</param>
+        /// <param name="okResponseFunc">Function to create Result object in case when http request was successful</param>
         /// <typeparam name="T">Result value type</typeparam>
-        /// <returns>Result object with the data from the http request</returns>
-        /// <exception cref="InvalidOperationException">Not possible to parse response from the server</exception>
-        private static async Task<Result<T, SmsErrorCode>> GetResultFromHttpResponseMessage<T>(
-            HttpResponseMessage responseMessage,
-            Func<string, T> okResultFunc)
+        /// <returns>Processed HTTP response</returns>
+        /// <exception cref="SmsException">Specific Sms error occurred</exception>
+        private async Task<T> MakeHttpRequestAsync<T>(
+            string requestUri,
+            Func<string, T> okResponseFunc)
         {
-            var responseContent = await responseMessage.Content.ReadAsStringAsync();
+            var response = await httpClient.GetAsync(requestUri);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new SmsException(
+                    $"An error occurred while processing request. Response code: {(int)response.StatusCode} ({response.StatusCode.ToString()})");
+            }
+
+            var responseContent = await response.Content.ReadAsStringAsync();
             try
             {
-                // Return error if it was sent in response. Otherwise, process response content to create result 
-                return responseContent.Contains(ErrorPropertyName)
-                    ? Result<T, SmsErrorCode>.Fail<T>((SmsErrorCode)long.Parse(GetValueFromListResponseContent(responseContent, ErrorPropertyName)))
-                    : okResultFunc(responseContent);
+                if (!responseContent.StartsWith($"[\"{ErrorPropertyName}"))
+                {
+                    return okResponseFunc(responseContent);
+                }
+
+                var errorCode = int.Parse(GetValueFromListResponseContent(responseContent, ErrorPropertyName));
+                throw new SmsException("An error occurred while processing request", (SmsErrorCode)errorCode);
+            }
+            catch (SmsException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException(
+                throw new SmsException(
                     $"Unable to process service response. Please contact support. Response content: {responseContent}",
                     ex);
             }
+            
+            /*var responseContent = await response.Content.ReadAsStringAsync();
+            if (responseContent.StartsWith($"[\"{ErrorPropertyName}"))
+            {
+                var errorCode = int.Parse(GetValueFromListResponseContent(responseContent, ErrorPropertyName));
+                throw new SmsException("An error occurred while processing request", (SmsErrorCode)errorCode);
+            }
+
+            try
+            {
+                return okResponseFunc(responseContent);
+            }
+            catch (Exception ex)
+            {
+                throw new SmsException(
+                    $"Unable to process service response. Please contact support. Response content: {responseContent}",
+                    ex);
+            }*/
         }
 
         private static string GetValueFromListResponseContent(string responseContent, string keyPropertyName)
